@@ -1,188 +1,200 @@
 <?php
-/**
- * Instructor Material Controller
- */
-
-require_once __DIR__ . '/../../models/Material.php';
-require_once __DIR__ . '/../../models/Lesson.php';
-require_once __DIR__ . '/../../models/Course.php';
-
 class MaterialController {
-    
-    /**
-     * Form upload tài liệu
-     */
-    public function upload($lesson_id) {
-        session_start();
-        
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-            header('Location: /btl/auth/login.php');
-            exit;
-        }
-        
-        $lessonModel = new Lesson();
-        $lesson = $lessonModel->getById($lesson_id);
-        
-        if (!$lesson) {
-            header('Location: /btl/instructor/course/manage');
-            exit;
-        }
-        
-        // Kiểm tra quyền sở hữu
-        $courseModel = new Course();
-        $course = $courseModel->getById($lesson['course_id']);
-        
-        if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
-            header('Location: /btl/instructor/course/manage');
-            exit;
-        }
-        
-        // Lấy danh sách tài liệu hiện có
-        $materialModel = new Material();
-        $materials = $materialModel->getByLesson($lesson_id);
-        
-        include __DIR__ . '/../../views/instructor/materials/upload.php';
+    private $db;
+    private $materialModel;
+    private $lessonModel;
+    private $courseModel;
+
+    public function __construct() {
+        $database = new Database();
+        $this->db = $database->getConnection();
+        $this->materialModel = new Material($this->db);
+        $this->lessonModel = new Lesson($this->db);
+        $this->courseModel = new Course($this->db);
     }
-    
+
     /**
-     * Xử lý upload tài liệu
+     * Upload tài liệu cho bài học
      */
-    public function store($lesson_id) {
-        session_start();
-        
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-            header('Location: /btl/auth/login.php');
-            exit;
-        }
+    public function upload($course_id, $lesson_id) {
+        // LƯU Ý: Check quyền giảng viên - do lập trình viên A làm
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /btl/instructor/materials/upload/' . $lesson_id);
+            echo json_encode(['success' => false, 'message' => 'Phương thức không hợp lệ']);
             exit;
         }
         
-        $lessonModel = new Lesson();
-        $lesson = $lessonModel->getById($lesson_id);
+        $instructor_id = $_SESSION['user_id'];
         
-        if (!$lesson) {
-            header('Location: /btl/instructor/course/manage');
-            exit;
-        }
-        
-        // Kiểm tra quyền sở hữu
-        $courseModel = new Course();
-        $course = $courseModel->getById($lesson['course_id']);
-        
-        if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
-            header('Location: /btl/instructor/course/manage');
+        // Kiểm tra quyền sở hữu bài học
+        if (!$this->lessonModel->isLessonOwner($lesson_id, $instructor_id)) {
+            echo json_encode(['success' => false, 'message' => 'Bạn không có quyền upload tài liệu cho bài học này']);
             exit;
         }
         
         // Kiểm tra file upload
-        if (!isset($_FILES['material_file']) || $_FILES['material_file']['error'] !== UPLOAD_ERR_OK) {
-            $_SESSION['error'] = 'Vui lòng chọn file để upload';
-            header('Location: /btl/instructor/materials/upload/' . $lesson_id);
+        if (!isset($_FILES['file']) || $_FILES['file']['error'] != 0) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng chọn file để upload']);
             exit;
         }
         
-        $file = $_FILES['material_file'];
+        $file = $_FILES['file'];
+        $file_name = $file['name'];
+        $file_tmp = $file['tmp_name'];
+        $file_size = $file['size'];
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
         
-        // Kiểm tra file type
-        $allowed_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'zip', 'jpg', 'png'];
-        $file_ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        
+        // Kiểm tra loại file
+        $allowed_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip', 'rar'];
         if (!in_array($file_ext, $allowed_types)) {
-            $_SESSION['error'] = 'Loại file không được hỗ trợ. Chỉ chấp nhận: ' . implode(', ', $allowed_types);
-            header('Location: /btl/instructor/materials/upload/' . $lesson_id);
+            echo json_encode(['success' => false, 'message' => 'Loại file không được hỗ trợ. Chỉ chấp nhận: ' . implode(', ', $allowed_types)]);
             exit;
         }
         
-        // Kiểm tra kích thước (max 50MB)
-        if ($file['size'] > 50 * 1024 * 1024) {
-            $_SESSION['error'] = 'File quá lớn. Kích thước tối đa: 50MB';
-            header('Location: /btl/instructor/materials/upload/' . $lesson_id);
+        // Kiểm tra kích thước file (max 10MB)
+        $max_size = 10 * 1024 * 1024;
+        if ($file_size > $max_size) {
+            echo json_encode(['success' => false, 'message' => 'Kích thước file quá lớn (tối đa 10MB)']);
             exit;
         }
         
-        // Tạo thư mục nếu chưa tồn tại
-        $upload_dir = __DIR__ . '/../../assets/uploads/materials/';
+        // Tạo thư mục upload nếu chưa tồn tại
+        $upload_dir = __DIR__ . '/../assets/uploads/materials/';
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
         
-        // Tạo tên file unique
-        $filename = 'material_' . time() . '_' . uniqid() . '.' . $file_ext;
-        $filepath = $upload_dir . $filename;
+        // Tạo tên file mới để tránh trùng lặp
+        $new_filename = time() . '_' . uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file_name);
+        $upload_path = $upload_dir . $new_filename;
         
         // Di chuyển file
-        if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            $materialModel = new Material();
+        if (move_uploaded_file($file_tmp, $upload_path)) {
+            // Lưu thông tin vào database
+            $this->materialModel->lesson_id = $lesson_id;
+            $this->materialModel->filename = $file_name;
+            $this->materialModel->file_path = $new_filename;
+            $this->materialModel->file_type = $file_ext;
+            $this->materialModel->file_size = $file_size;
             
-            // Lưu vào database
-            if ($materialModel->upload($lesson_id, $filename, $filepath, $file_ext)) {
-                $_SESSION['success'] = 'Upload tài liệu thành công!';
-            } else {
-                $_SESSION['error'] = 'Có lỗi xảy ra khi lưu thông tin tài liệu';
-                // Xóa file đã upload
-                unlink($filepath);
+            if ($material_id = $this->materialModel->create()) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Upload tài liệu thành công',
+                    'material' => [
+                        'id' => $material_id,
+                        'filename' => $file_name,
+                        'file_type' => $file_ext,
+                        'file_size' => $this->formatFileSize($file_size),
+                        'uploaded_at' => date('d/m/Y H:i')
+                    ]
+                ]);
+                exit;
             }
-        } else {
-            $_SESSION['error'] = 'Có lỗi xảy ra khi upload file';
         }
         
-        header('Location: /btl/instructor/materials/upload/' . $lesson_id);
+        echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra khi upload file']);
         exit;
     }
-    
+
     /**
      * Xóa tài liệu
      */
-    public function destroy($material_id) {
-        session_start();
+    public function delete($material_id) {
+        // LƯU Ý: Check quyền giảng viên và CSRF token - do lập trình viên A làm
         
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 1) {
-            header('Location: /btl/auth/login.php');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = 'Phương thức không hợp lệ';
+            header('Location: /instructor/courses');
             exit;
         }
         
-        $materialModel = new Material();
-        $material = $materialModel->getById($material_id);
+        $instructor_id = $_SESSION['user_id'];
         
+        // Kiểm tra quyền sở hữu tài liệu
+        if (!$this->materialModel->isMaterialOwner($material_id, $instructor_id)) {
+            $_SESSION['error'] = 'Bạn không có quyền xóa tài liệu này';
+            header('Location: /instructor/courses');
+            exit;
+        }
+        
+        // Lấy thông tin tài liệu
+        $material = $this->materialModel->readOne($material_id);
         if (!$material) {
-            header('Location: /btl/instructor/course/manage');
-            exit;
-        }
-        
-        // Kiểm tra quyền sở hữu qua lesson -> course
-        $lessonModel = new Lesson();
-        $lesson = $lessonModel->getById($material['lesson_id']);
-        
-        if (!$lesson) {
-            header('Location: /btl/instructor/course/manage');
-            exit;
-        }
-        
-        $courseModel = new Course();
-        $course = $courseModel->getById($lesson['course_id']);
-        
-        if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
-            header('Location: /btl/instructor/course/manage');
+            $_SESSION['error'] = 'Tài liệu không tồn tại';
+            header('Location: /instructor/courses');
             exit;
         }
         
         // Xóa file vật lý
-        if (file_exists($material['file_path'])) {
-            unlink($material['file_path']);
+        $file_path = __DIR__ . '/../assets/uploads/materials/' . $material['file_path'];
+        if (file_exists($file_path)) {
+            unlink($file_path);
         }
         
-        // Xóa trong database
-        if ($materialModel->delete($material_id)) {
+        // Xóa record trong database
+        $this->materialModel->id = $material_id;
+        
+        if ($this->materialModel->delete()) {
             $_SESSION['success'] = 'Xóa tài liệu thành công!';
         } else {
             $_SESSION['error'] = 'Có lỗi xảy ra khi xóa tài liệu';
         }
         
-        header('Location: /btl/instructor/materials/upload/' . $lesson['id']);
+        header('Location: /instructor/courses/' . $material['course_id'] . '/lessons/' . $material['lesson_id'] . '/edit');
         exit;
+    }
+
+    /**
+     * Download tài liệu
+     */
+    public function download($material_id) {
+        // Kiểm tra quyền truy cập tài liệu
+        // Nếu là học viên: kiểm tra xem đã đăng ký khóa học chưa
+        // Nếu là giảng viên: kiểm tra quyền sở hữu
+        // LƯU Ý: Phần này do lập trình viên A làm
+        
+        $material = $this->materialModel->readOne($material_id);
+        if (!$material) {
+            $_SESSION['error'] = 'Tài liệu không tồn tại';
+            header('Location: /');
+            exit;
+        }
+        
+        $file_path = __DIR__ . '/../assets/uploads/materials/' . $material['file_path'];
+        
+        if (!file_exists($file_path)) {
+            $_SESSION['error'] = 'File không tồn tại trên server';
+            header('Location: /');
+            exit;
+        }
+        
+        // Thiết lập headers cho download
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . $material['filename'] . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file_path));
+        
+        readfile($file_path);
+        exit;
+    }
+
+    /**
+     * Format kích thước file
+     */
+    private function formatFileSize($bytes) {
+        if ($bytes >= 1073741824) {
+            return number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' bytes';
+        }
     }
 }
 ?>

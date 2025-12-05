@@ -1,173 +1,115 @@
 <?php
-/**
- * Material Model - Quản lý tài liệu đính kèm
- */
 
-require_once __DIR__ . '/../config/Database.php';
+class Material
+{
+    private $conn;
+    private $tableName = "materials";
 
-class Material {
-    private $db;
-    private $table = 'materials';
+    public $id;
+    public $lessonId;
+    public $filename;
+    public $filePath;
+    public $fileType;
+    public $fileSize;
+    public $uploadedAt;
 
-    public function __construct() {
-        $database = Database::getInstance();
-        $this->db = $database->getConnection();
+    public function __construct($db)
+    {
+        $this->conn = $db;
     }
 
-    /**
-     * Upload tài liệu mới
-     */
-    public function upload($lesson_id, $file_info) {
-        $sql = "INSERT INTO {$this->table} 
-                (lesson_id, filename, file_path, file_type, uploaded_at) 
-                VALUES (:lesson_id, :filename, :file_path, :file_type, NOW())";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            
-            $result = $stmt->execute([
-                ':lesson_id' => $lesson_id,
-                ':filename' => $file_info['filename'] ?? '',
-                ':file_path' => $file_info['file_path'] ?? '',
-                ':file_type' => $file_info['file_type'] ?? ''
-            ]);
-            
-            return $result ? $this->db->lastInsertId() : false;
-            
-        } catch (PDOException $e) {
-            error_log("Material Model - Upload Error: " . $e->getMessage());
-            return false;
+    public function create()
+    {
+        $query = "INSERT INTO " . $this->tableName . "
+                SET lesson_id = :lesson_id,
+                    filename = :filename,
+                    file_path = :file_path,
+                    file_type = :file_type,
+                    file_size = :file_size,
+                    uploaded_at = NOW()";
+
+        $stmt = $this->conn->prepare($query);
+
+        $this->filename = htmlspecialchars(strip_tags($this->filename));
+
+        $stmt->bindParam(":lesson_id", $this->lessonId);
+        $stmt->bindParam(":filename", $this->filename);
+        $stmt->bindParam(":file_path", $this->filePath);
+        $stmt->bindParam(":file_type", $this->fileType);
+        $stmt->bindParam(":file_size", $this->fileSize);
+
+        if ($stmt->execute()) {
+            $this->id = $this->conn->lastInsertId();
+            return $this->id;
         }
+
+        return false;
     }
 
-    /**
-     * Lấy tài liệu theo ID
-     */
-    public function getById($material_id) {
-        $sql = "SELECT m.*, l.title as lesson_title, l.course_id 
-                FROM {$this->table} m
-                JOIN lessons l ON m.lesson_id = l.id
-                WHERE m.id = :id LIMIT 1";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $material_id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            return $stmt->fetch();
-        } catch (PDOException $e) {
-            error_log("Material Model - GetById Error: " . $e->getMessage());
-            return false;
-        }
+    public function delete()
+    {
+        $query = "DELETE FROM " . $this->tableName . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id", $this->id);
+
+        return $stmt->execute();
     }
 
-    /**
-     * Lấy tất cả tài liệu của bài học
-     */
-    public function getByLesson($lesson_id) {
-        $sql = "SELECT * FROM {$this->table} 
-                WHERE lesson_id = :lesson_id 
+    public function getByLesson($lessonId)
+    {
+        $query = "SELECT * FROM " . $this->tableName . "
+                WHERE lesson_id = :lesson_id
                 ORDER BY uploaded_at DESC";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':lesson_id', $lesson_id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            error_log("Material Model - GetByLesson Error: " . $e->getMessage());
-            return [];
-        }
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':lesson_id', $lessonId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Xóa tài liệu
-     */
-    public function delete($material_id) {
-        try {
-            // Lấy thông tin file trước khi xóa
-            $material = $this->getById($material_id);
+    public function readOne($id)
+    {
+        $query = "SELECT m.*, l.title as lesson_title, l.course_id, c.instructor_id
+                FROM " . $this->tableName . " m
+                LEFT JOIN lessons l ON m.lesson_id = l.id
+                LEFT JOIN courses c ON l.course_id = c.id
+                WHERE m.id = :id";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            if (!$material) {
-                return false;
-            }
+            $this->id = $row['id'];
+            $this->lessonId = $row['lesson_id'];
+            $this->filename = $row['filename'];
+            $this->filePath = $row['file_path'];
+            $this->fileType = $row['file_type'];
+            $this->fileSize = $row['file_size'];
+            $this->uploadedAt = $row['uploaded_at'];
             
-            // Xóa trong database
-            $sql = "DELETE FROM {$this->table} WHERE id = :id";
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $material_id, PDO::PARAM_INT);
-            $result = $stmt->execute();
-            
-            // Xóa file vật lý nếu thành công
-            if ($result && isset($material['file_path']) && file_exists($material['file_path'])) {
-                unlink($material['file_path']);
-            }
-            
-            return $result;
-            
-        } catch (PDOException $e) {
-            error_log("Material Model - Delete Error: " . $e->getMessage());
-            return false;
+            return $row;
         }
+        
+        return false;
     }
 
-    /**
-     * Cập nhật số lượt download
-     */
-    public function incrementDownload($material_id) {
-        $sql = "UPDATE {$this->table} SET download_count = COALESCE(download_count, 0) + 1 
-                WHERE id = :id";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':id', $material_id, PDO::PARAM_INT);
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            error_log("Material Model - IncrementDownload Error: " . $e->getMessage());
-            return false;
-        }
-    }
+    public function isMaterialOwner($materialId, $instructorId)
+    {
+        $query = "SELECT m.id 
+                FROM " . $this->tableName . " m
+                LEFT JOIN lessons l ON m.lesson_id = l.id
+                LEFT JOIN courses c ON l.course_id = c.id
+                WHERE m.id = :material_id AND c.instructor_id = :instructor_id";
 
-    /**
-     * Đếm số tài liệu của bài học
-     */
-    public function countByLesson($lesson_id) {
-        $sql = "SELECT COUNT(*) as total FROM {$this->table} 
-                WHERE lesson_id = :lesson_id";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':lesson_id', $lesson_id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            return (int)$stmt->fetchColumn();
-        } catch (PDOException $e) {
-            error_log("Material Model - CountByLesson Error: " . $e->getMessage());
-            return 0;
-        }
-    }
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindValue(':material_id', $materialId, PDO::PARAM_INT);
+        $stmt->bindValue(':instructor_id', $instructorId, PDO::PARAM_INT);
+        $stmt->execute();
 
-    /**
-     * Lấy tất cả tài liệu của khóa học
-     */
-    public function getByCourse($course_id) {
-        $sql = "SELECT m.*, l.title as lesson_title, l.`order` as lesson_order 
-                FROM {$this->table} m
-                JOIN lessons l ON m.lesson_id = l.id
-                WHERE l.course_id = :course_id
-                ORDER BY l.`order` ASC, m.uploaded_at DESC";
-        
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindParam(':course_id', $course_id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            error_log("Material Model - GetByCourse Error: " . $e->getMessage());
-            return [];
-        }
+        return $stmt->rowCount() > 0;
     }
 }
-?>
