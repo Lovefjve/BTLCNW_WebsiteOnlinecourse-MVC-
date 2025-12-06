@@ -1,51 +1,48 @@
 <?php
+// models/Category.php
+require_once 'config/Database.php';
 
-class Category
-{
+class Category {
     private $conn;
-    private $tableName = "categories";
-
+    private $table = 'categories';
+    
     public $id;
     public $name;
     public $description;
-    public $createdAt;
-
-    public function __construct($db)
-    {
-        $this->conn = $db;
+    public $created_at;
+    
+    public function __construct() {
+        $database = new Database();
+        $this->conn = $database->getConnection();
     }
-
-    public function getAll()
-    {
-        $query = "SELECT * FROM " . $this->tableName . " 
-                ORDER BY name ASC";
-        
+    
+    public function getAll() {
+        $query = "SELECT * FROM " . $this->table . " ORDER BY name ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    public function readOne($id)
-    {
-        $query = "SELECT * FROM " . $this->tableName . " 
-                WHERE id = :id";
-        
+    
+    public function getById($id) {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = :id LIMIT 1";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
         
-        if ($stmt->rowCount() > 0) {
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            $this->id = $row['id'];
-            $this->name = $row['name'];
-            $this->description = $row['description'];
-            $this->createdAt = $row['created_at'];
-            
-            return $row;
-        }
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    public function create() {
+        $query = "INSERT INTO " . $this->table . " 
+                 SET name = :name, description = :description, created_at = NOW()";
         
-        return false;
+        $stmt = $this->conn->prepare($query);
+        
+        $stmt->bindParam(':name', $this->name);
+        $stmt->bindParam(':description', $this->description);
+        
+        return $stmt->execute();
     }
 }
+?>
