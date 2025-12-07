@@ -24,6 +24,9 @@ $method = $_SERVER['REQUEST_METHOD'];
 // Loại bỏ base url nếu có
 $request = str_replace('/onlinecourse', '', $request);
 
+// Loại bỏ query string từ request path
+$request = strtok($request, '?');
+
 // Routing
 switch ($request) {
     case '/':
@@ -74,10 +77,6 @@ switch ($request) {
     case '/admin/deleteUser':
         $controller = new AdminController();
         $controller->deleteUser();
-        break;
-    case '/admin/updateUserStatus':
-        $controller = new AdminController();
-        $controller->updateUserStatus();
         break;
     case '/auth/logout':
         $controller = new AuthController();

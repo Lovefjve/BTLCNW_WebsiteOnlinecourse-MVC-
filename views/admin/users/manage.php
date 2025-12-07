@@ -27,23 +27,25 @@
             background-color: #f5f5f5;
         }
         .btn {
-            padding: 5px 10px;
+            padding: 6px 12px;
             margin: 2px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
         }
-        .btn-activate {
-            background-color: #28a745;
+        .btn-create {
+            background-color: #007bff;
             color: white;
         }
-        .btn-deactivate {
-            background-color: #dc3545;
-            color: white;
+        .btn-edit {
+            background-color: #ffc107;
+            color: black;
         }
         .btn-delete {
-            background-color: #6c757d;
+            background-color: #dc3545;
             color: white;
         }
         .btn:hover {
@@ -66,12 +68,40 @@
         .role-2 {
             background-color: #f3e5f5;
         }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Quản lý Người dùng</h1>
+        <div class="header">
+            <h1>Quản lý Người dùng</h1>
+            <a href="<?php echo BASE_URL; ?>/admin/createUser" class="btn btn-create">+ Tạo tài khoản mới</a>
+        </div>
+        
         <p><a href="<?php echo BASE_URL; ?>/admin/dashboard">← Về Dashboard</a> | <a href="<?php echo BASE_URL; ?>/auth/logout">Đăng xuất</a></p>
+
+        <?php if (isset($_GET['success'])): ?>
+            <?php if ($_GET['success'] === 'created'): ?>
+                <div class="success-message">Tạo tài khoản thành công!</div>
+            <?php elseif ($_GET['success'] === 'updated'): ?>
+                <div class="success-message">Cập nhật tài khoản thành công!</div>
+            <?php elseif ($_GET['success'] === 'deleted'): ?>
+                <div class="success-message">Xóa tài khoản thành công!</div>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <?php if (!empty($users)): ?>
             <table>
@@ -82,7 +112,6 @@
                         <th>Email</th>
                         <th>Họ tên</th>
                         <th>Vai trò</th>
-                        <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -94,8 +123,6 @@
                         elseif ($u['role'] == 1) $roleText = 'Giảng viên';
                         elseif ($u['role'] == 2) $roleText = 'Admin';
                         
-                        $statusClass = ($u['status'] ?? 'active') === 'active' ? 'status-active' : 'status-inactive';
-                        $statusText = ($u['status'] ?? 'active') === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa';
                         $roleClass = 'role-' . $u['role'];
                     ?>
                         <tr class="<?php echo $roleClass; ?>">
@@ -104,19 +131,9 @@
                             <td><?php echo htmlspecialchars($u['email']); ?></td>
                             <td><?php echo htmlspecialchars($u['fullname']); ?></td>
                             <td><?php echo $roleText; ?></td>
-                            <td class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></td>
-                            <td><?php echo htmlspecialchars($u['created_at']); ?></td>
+                            <td><?php echo htmlspecialchars($u['created_at'] ?? 'N/A'); ?></td>
                             <td>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
-                                    <?php if (($u['status'] ?? 'active') === 'active'): ?>
-                                        <input type="hidden" name="status" value="inactive">
-                                        <button type="submit" class="btn btn-deactivate" formaction="<?php echo BASE_URL; ?>/admin/updateUserStatus">Vô hiệu hóa</button>
-                                    <?php else: ?>
-                                        <input type="hidden" name="status" value="active">
-                                        <button type="submit" class="btn btn-activate" formaction="<?php echo BASE_URL; ?>/admin/updateUserStatus">Kích hoạt</button>
-                                    <?php endif; ?>
-                                </form>
+                                <a href="<?php echo BASE_URL; ?>/admin/editUser?id=<?php echo $u['id']; ?>" class="btn btn-edit">Chỉnh sửa</a>
                                 <form method="POST" action="<?php echo BASE_URL; ?>/admin/deleteUser" style="display: inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa người dùng này?');">
                                     <input type="hidden" name="user_id" value="<?php echo $u['id']; ?>">
                                     <button type="submit" class="btn btn-delete">Xóa</button>

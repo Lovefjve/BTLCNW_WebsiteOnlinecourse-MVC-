@@ -40,37 +40,7 @@ class AdminController {
 
         $user = Auth::getUser();
         $users = $this->userModel->getAllUsers();
-        require_once 'views/admin/users/manage_new.php';
-    }
-
-    // Cập nhật trạng thái người dùng
-    public function updateUserStatus() {
-        if (!Auth::isLoggedIn() || !Auth::hasRole(2)) {
-            http_response_code(403);
-            echo 'Unauthorized';
-            exit;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $userId = isset($_POST['user_id']) ? (int)$_POST['user_id'] : 0;
-            $status = isset($_POST['status']) ? $_POST['status'] : 'active';
-
-            // Chỉ cho phép status = 'active' hoặc 'inactive'
-            if (!in_array($status, ['active', 'inactive'])) {
-                http_response_code(400);
-                echo 'Invalid status';
-                exit;
-            }
-
-            if ($this->userModel->updateUserStatus($userId, $status)) {
-                header('Location: ' . BASE_URL . '/admin/users');
-                exit;
-            }
-        }
-
-        http_response_code(400);
-        echo 'Bad Request';
-        exit;
+        require_once 'views/admin/users/manage.php';
     }
 
     // Tạo người dùng mới
@@ -152,7 +122,7 @@ class AdminController {
         }
 
         $errors = [];
-        $data = $editUser;
+        $data = $editUser; // Khởi tạo $data từ dữ liệu cũ
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $data = [
@@ -160,27 +130,16 @@ class AdminController {
                 'email' => trim($_POST['email'] ?? ''),
                 'password' => $_POST['password'] ?? '',
                 'fullname' => trim($_POST['fullname'] ?? ''),
-                'role' => isset($_POST['role']) ? (int)$_POST['role'] : 0
+                'role' => !empty($_POST['role']) ? (int)$_POST['role'] : 0
             ];
 
-            // Validate username (chỉ nếu thay đổi)
-            if ($data['username'] !== $editUser['username']) {
-                if (empty($data['username'])) {
-                    $errors['username'] = 'Vui lòng nhập tên đăng nhập';
-                } elseif ($this->userModel->findUserByUsername($data['username'])) {
-                    $errors['username'] = 'Tên đăng nhập đã tồn tại';
-                }
-            }
-
             // Validate email (chỉ nếu thay đổi)
-            if ($data['email'] !== $editUser['email']) {
-                if (empty($data['email'])) {
-                    $errors['email'] = 'Vui lòng nhập email';
-                } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-                    $errors['email'] = 'Email không hợp lệ';
-                } elseif ($this->userModel->findUserByEmail($data['email'])) {
-                    $errors['email'] = 'Email đã tồn tại';
-                }
+            if (empty($data['email'])) {
+                $errors['email'] = 'Vui lòng nhập email';
+            } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                $errors['email'] = 'Email không hợp lệ';
+            } elseif ($data['email'] !== $editUser['email'] && $this->userModel->findUserByEmail($data['email'])) {
+                $errors['email'] = 'Email đã tồn tại';
             }
 
             // Validate password (nếu để trống, không thay đổi)

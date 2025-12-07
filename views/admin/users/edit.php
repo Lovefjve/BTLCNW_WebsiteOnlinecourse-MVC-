@@ -87,13 +87,13 @@
             <form method="POST">
                 <div class="form-group">
                     <label for="username">Tên đăng nhập</label>
-                    <input type="text" name="username" id="username" value="<?php echo !empty($editUser['username']) ? htmlspecialchars($editUser['username']) : ''; ?>" disabled>
+                    <input type="text" id="username" value="<?php echo htmlspecialchars($data['username'] ?? ''); ?>" disabled>
                     <small style="color: #666;">Không thể thay đổi tên đăng nhập</small>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email *</label>
-                    <input type="email" name="email" id="email" value="<?php echo !empty($data['email']) ? htmlspecialchars($data['email']) : (isset($editUser['email']) ? htmlspecialchars($editUser['email']) : ''); ?>" required>
+                    <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($data['email'] ?? ''); ?>" required>
                     <?php if (!empty($errors['email'])): ?>
                         <div class="error"><?php echo htmlspecialchars($errors['email']); ?></div>
                     <?php endif; ?>
@@ -101,7 +101,7 @@
 
                 <div class="form-group">
                     <label for="password">Mật khẩu</label>
-                    <input type="password" name="password" id="password">
+                    <input type="password" name="password" id="password" value="">
                     <div class="password-note">Để trống nếu không muốn thay đổi mật khẩu</div>
                     <?php if (!empty($errors['password'])): ?>
                         <div class="error"><?php echo htmlspecialchars($errors['password']); ?></div>
@@ -110,7 +110,7 @@
 
                 <div class="form-group">
                     <label for="fullname">Họ tên *</label>
-                    <input type="text" name="fullname" id="fullname" value="<?php echo !empty($data['fullname']) ? htmlspecialchars($data['fullname']) : (isset($editUser['fullname']) ? htmlspecialchars($editUser['fullname']) : ''); ?>" required>
+                    <input type="text" name="fullname" id="fullname" value="<?php echo htmlspecialchars($data['fullname'] ?? ''); ?>" required>
                     <?php if (!empty($errors['fullname'])): ?>
                         <div class="error"><?php echo htmlspecialchars($errors['fullname']); ?></div>
                     <?php endif; ?>
@@ -119,9 +119,9 @@
                 <div class="form-group">
                     <label for="role">Vai trò *</label>
                     <select name="role" id="role" required>
-                        <option value="0" <?php echo (!empty($data['role']) && $data['role'] == 0) ? 'selected' : (isset($editUser['role']) && $editUser['role'] == 0 ? 'selected' : ''); ?>>Học viên</option>
-                        <option value="1" <?php echo (!empty($data['role']) && $data['role'] == 1) ? 'selected' : (isset($editUser['role']) && $editUser['role'] == 1 ? 'selected' : ''); ?>>Giảng viên</option>
-                        <option value="2" <?php echo (!empty($data['role']) && $data['role'] == 2) ? 'selected' : (isset($editUser['role']) && $editUser['role'] == 2 ? 'selected' : ''); ?>>Admin</option>
+                        <option value="0" <?php echo (isset($data['role']) && $data['role'] == 0) ? 'selected' : ''; ?>>Học viên</option>
+                        <option value="1" <?php echo (isset($data['role']) && $data['role'] == 1) ? 'selected' : ''; ?>>Giảng viên</option>
+                        <option value="2" <?php echo (isset($data['role']) && $data['role'] == 2) ? 'selected' : ''; ?>>Admin</option>
                     </select>
                 </div>
 

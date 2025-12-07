@@ -120,6 +120,12 @@ class User extends Model {
         $stmt->bindParam(':password', $data['password']);
         $stmt->bindParam(':fullname', $data['fullname']);
         $stmt->bindParam(':role', $data['role'], PDO::PARAM_INT);
-        return $stmt->execute();
+        
+        try {
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Database error in updateUser: ' . $e->getMessage());
+            return false;
+        }
     }
 }

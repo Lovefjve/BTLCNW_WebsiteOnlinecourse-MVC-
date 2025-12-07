@@ -16,7 +16,7 @@
         
         <h2>Chức năng Quản lý</h2>
         <ul>
-            <li><a href="<?php echo BASE_URL; ?>/admin/users">Quản lý người dùng</a> - Xem, kích hoạt, vô hiệu hóa, xóa người dùng</li>
+            <li><a href="<?php echo BASE_URL; ?>/admin/users">Quản lý người dùng</a> - Xem, thêm, chỉnh sửa, xóa người dùng</li>
         </ul>
 
         <p><a href="<?php echo BASE_URL; ?>/auth/logout">Đăng xuất</a></p>
