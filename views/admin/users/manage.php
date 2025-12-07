@@ -13,74 +13,123 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         th {
-            background-color: #f2f2f2;
-            font-weight: bold;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            font-weight: 600;
+            padding: 15px 12px;
+            text-align: left;
+        }
+        td {
+            border-bottom: 1px solid #ddd;
+            padding: 12px;
+            color: #555;
         }
         tr:hover {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
+        }
+        tr:last-child td {
+            border-bottom: none;
         }
         .btn {
-            padding: 6px 12px;
+            padding: 8px 14px;
             margin: 2px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
         .btn-create {
             background-color: #007bff;
             color: white;
         }
+        .btn-create:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+        }
         .btn-edit {
             background-color: #ffc107;
             color: black;
+        }
+        .btn-edit:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
         }
         .btn-delete {
             background-color: #dc3545;
             color: white;
         }
-        .btn:hover {
-            opacity: 0.8;
-        }
-        .status-active {
-            color: green;
-            font-weight: bold;
-        }
-        .status-inactive {
-            color: red;
-            font-weight: bold;
+        .btn-delete:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
         }
         .role-0 {
             background-color: #e3f2fd;
         }
+        .role-0:hover {
+            background-color: #bbdefb;
+        }
         .role-1 {
             background-color: #fff3e0;
         }
+        .role-1:hover {
+            background-color: #ffe0b2;
+        }
         .role-2 {
             background-color: #f3e5f5;
+        }
+        .role-2:hover {
+            background-color: #e1bee7;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            flex: 1;
         }
         .success-message {
             background-color: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            border: 2px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .success-message::before {
+            content: "✓ ";
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            color: #333;
         }
     </style>
 </head>

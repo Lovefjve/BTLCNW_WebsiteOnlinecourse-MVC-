@@ -12,65 +12,99 @@
         .form-container {
             max-width: 500px;
             margin: 30px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #007bff;
         }
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
         }
         input, select {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
             font-size: 14px;
             box-sizing: border-box;
+            transition: all 0.3s ease;
         }
         input:focus, select:focus {
             outline: none;
             border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        input:disabled {
+            background-color: #f0f0f0;
+            color: #999;
+            cursor: not-allowed;
         }
         .error {
-            color: red;
+            color: #dc3545;
             font-size: 12px;
-            margin-top: 3px;
+            margin-top: 5px;
+            display: block;
         }
         button {
             background-color: #007bff;
             color: white;
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 14px;
+            font-weight: 600;
             width: 100%;
+            transition: all 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-link:hover {
+            background-color: #5a6268;
+            text-decoration: none;
         }
         .db-error {
             background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 12px;
-            border-radius: 4px;
+            border: 2px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 6px;
             margin-bottom: 20px;
         }
         .password-note {
             font-size: 12px;
             color: #666;
-            margin-top: 3px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        small {
+            color: #999;
+            display: block;
+            margin-top: 5px;
         }
     </style>
 </head>
