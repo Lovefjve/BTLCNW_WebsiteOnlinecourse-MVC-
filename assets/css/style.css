@@ -1,4 +1,6 @@
-/* assets/css/style.css */
+/* assets/css/style.css - HOÀN CHỈNH */
+
+/* Reset và base styles */
 * {
     margin: 0;
     padding: 0;
@@ -12,12 +14,14 @@ body {
     line-height: 1.6;
 }
 
+/* Container chung */
 .instructor-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
 
+/* Header */
 .dashboard-header {
     background: white;
     border-radius: 10px;
@@ -38,7 +42,8 @@ body {
     gap: 12px;
 }
 
-.create-btn {
+/* Buttons */
+.create-btn, .btn {
     background: linear-gradient(135deg, #4a6cf7 0%, #6a11cb 100%);
     color: white;
     border: none;
@@ -52,15 +57,17 @@ body {
     font-size: 15px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
+    cursor: pointer;
 }
 
-.create-btn:hover {
+.create-btn:hover, .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(74, 108, 247, 0.4);
     text-decoration: none;
     color: white;
 }
 
+/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -120,6 +127,7 @@ body {
     font-weight: 500;
 }
 
+/* Courses Section */
 .courses-section {
     background: white;
     border-radius: 10px;
@@ -155,6 +163,7 @@ body {
     font-weight: 600;
 }
 
+/* Courses Table */
 .courses-table {
     width: 100%;
     border-collapse: collapse;
@@ -185,6 +194,7 @@ body {
     background: #f8f9fa;
 }
 
+/* Course Info */
 .course-info {
     display: flex;
     align-items: center;
@@ -201,6 +211,12 @@ body {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+
+.course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .course-details h4 {
@@ -225,6 +241,7 @@ body {
 .tag-category { background: #e3f2fd; color: #1976d2; }
 .tag-level { background: #e8f5e9; color: #2e7d32; }
 
+/* Status Badges */
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -238,6 +255,7 @@ body {
 .status-draft { background: #d1ecf1; color: #0c5460; }
 .status-rejected { background: #f8d7da; color: #721c24; }
 
+/* Price and Student Count */
 .student-count {
     font-weight: 600;
     color: #2c3e50;
@@ -257,6 +275,7 @@ body {
     font-size: 14px;
 }
 
+/* Action Buttons */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -287,6 +306,7 @@ body {
     color: white;
 }
 
+/* Empty State */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -310,6 +330,7 @@ body {
     color: #bdc3c7;
 }
 
+/* Pagination */
 .pagination {
     display: flex;
     justify-content: center;
@@ -341,6 +362,7 @@ body {
     border-color: #4a6cf7;
 }
 
+/* Alerts */
 .alert {
     padding: 15px 20px;
     border-radius: 8px;
@@ -360,9 +382,123 @@ body {
     border-color: #f5c6cb;
 }
 
+/* Form Styles */
+.create-course-form, .edit-course-form {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group.required label::after {
+    content: " *";
+    color: #e74c3c;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+    border-color: #e74c3c;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-cancel {
+    background: #95a5a6;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.btn-cancel:hover {
+    background: #7f8c8d;
+    color: white;
+    text-decoration: none;
+}
+
+/* File Preview */
+.file-preview {
+    margin-top: 10px;
+}
+
+.file-preview img {
+    max-width: 200px;
+    border-radius: 6px;
+    display: none;
+}
+
+.current-image {
+    margin-top: 10px;
+}
+
+.current-image img {
+    max-width: 200px;
+    border-radius: 6px;
+}
+
+/* Responsive Design */
 @media (max-width: 992px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -396,97 +532,14 @@ body {
         width: 100%;
         height: 32px;
     }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
 }
-.create-course-form {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            margin-top: 20px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .form-group.required label::after {
-            content: " *";
-            color: #e74c3c;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            font-family: inherit;
-        }
-        
-        .form-group input.error,
-        .form-group select.error,
-        .form-group textarea.error {
-            border-color: #e74c3c;
-        }
-        
-        .error-message {
-            color: #e74c3c;
-            font-size: 13px;
-            margin-top: 5px;
-            display: block;
-        }
-        
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .btn-cancel {
-            background: #95a5a6;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-cancel:hover {
-            background: #7f8c8d;
-            color: white;
-            text-decoration: none;
-        }
-        
-        .file-preview {
-            margin-top: 10px;
-            max-width: 200px;
-        }
-        
-        .file-preview img {
-            max-width: 100%;
-            border-radius: 6px;
-            display: none;
-        }
