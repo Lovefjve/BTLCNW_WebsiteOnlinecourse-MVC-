@@ -121,14 +121,6 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="status">Trạng thái *</label>
-                    <select name="status" id="status" required>
-                        <option value="active" <?php echo (!empty($data['status']) && $data['status'] === 'active') ? 'selected' : ''; ?>>Kích hoạt</option>
-                        <option value="inactive" <?php echo (!empty($data['status']) && $data['status'] === 'inactive') ? 'selected' : ''; ?>>Vô hiệu hóa</option>
-                    </select>
-                </div>
-
                 <button type="submit">Tạo Tài khoản</button>
             </form>
         </div>

@@ -40,7 +40,7 @@ class AdminController {
 
         $user = Auth::getUser();
         $users = $this->userModel->getAllUsers();
-        require_once 'views/admin/users/manage.php';
+        require_once 'views/admin/users/manage_new.php';
     }
 
     // Cập nhật trạng thái người dùng
@@ -89,8 +89,7 @@ class AdminController {
                 'email' => trim($_POST['email'] ?? ''),
                 'password' => $_POST['password'] ?? '',
                 'fullname' => trim($_POST['fullname'] ?? ''),
-                'role' => isset($_POST['role']) ? (int)$_POST['role'] : 0,
-                'status' => $_POST['status'] ?? 'active'
+                'role' => isset($_POST['role']) ? (int)$_POST['role'] : 0
             ];
 
             // Validate
@@ -161,8 +160,7 @@ class AdminController {
                 'email' => trim($_POST['email'] ?? ''),
                 'password' => $_POST['password'] ?? '',
                 'fullname' => trim($_POST['fullname'] ?? ''),
-                'role' => isset($_POST['role']) ? (int)$_POST['role'] : 0,
-                'status' => $_POST['status'] ?? 'active'
+                'role' => isset($_POST['role']) ? (int)$_POST['role'] : 0
             ];
 
             // Validate username (chỉ nếu thay đổi)

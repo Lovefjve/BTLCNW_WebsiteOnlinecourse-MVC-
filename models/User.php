@@ -68,7 +68,7 @@ class User extends Model {
 
     // Lấy tất cả người dùng
     public function getAllUsers() {
-        $query = 'SELECT id, username, email, fullname, role, status, created_at FROM users ORDER BY created_at DESC';
+        $query = 'SELECT id, username, email, fullname, role, created_at FROM users ORDER BY created_at DESC';
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -85,11 +85,8 @@ class User extends Model {
 
     // Cập nhật trạng thái người dùng (active/inactive)
     public function updateUserStatus($id, $status) {
-        $query = 'UPDATE users SET status = :status WHERE id = :id';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':status', $status);
-        return $stmt->execute();
+        // Hàm này không dùng vì bảng chưa có cột status
+        return false;
     }
 
     // Xóa người dùng
@@ -102,30 +99,27 @@ class User extends Model {
 
     // Tạo người dùng (admin tạo)
     public function createUser($data) {
-        $query = 'INSERT INTO users (username, email, password, fullname, role, status, created_at) 
-                  VALUES (:username, :email, :password, :fullname, :role, :status, NOW())';
+        $query = 'INSERT INTO users (username, email, password, fullname, role, created_at) 
+                  VALUES (:username, :email, :password, :fullname, :role, NOW())';
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':username', $data['username']);
         $stmt->bindParam(':email', $data['email']);
         $stmt->bindParam(':password', $data['password']);
         $stmt->bindParam(':fullname', $data['fullname']);
         $stmt->bindParam(':role', $data['role'], PDO::PARAM_INT);
-        $stmt->bindParam(':status', $data['status']);
         return $stmt->execute();
     }
 
     // Cập nhật thông tin người dùng
     public function updateUser($id, $data) {
-        $query = 'UPDATE users SET username = :username, email = :email, password = :password, 
-                  fullname = :fullname, role = :role, status = :status WHERE id = :id';
+        $query = 'UPDATE users SET email = :email, password = :password, 
+                  fullname = :fullname, role = :role WHERE id = :id';
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':username', $data['username']);
         $stmt->bindParam(':email', $data['email']);
         $stmt->bindParam(':password', $data['password']);
         $stmt->bindParam(':fullname', $data['fullname']);
         $stmt->bindParam(':role', $data['role'], PDO::PARAM_INT);
-        $stmt->bindParam(':status', $data['status']);
         return $stmt->execute();
     }
 }

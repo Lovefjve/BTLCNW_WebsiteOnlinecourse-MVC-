@@ -112,7 +112,6 @@
                         <th>Email</th>
                         <th>Họ tên</th>
                         <th>Vai trò</th>
-                        <th>Trạng thái</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -124,8 +123,6 @@
                         elseif ($u['role'] == 1) $roleText = 'Giảng viên';
                         elseif ($u['role'] == 2) $roleText = 'Admin';
                         
-                        $statusClass = ($u['status'] ?? 'active') === 'active' ? 'status-active' : 'status-inactive';
-                        $statusText = ($u['status'] ?? 'active') === 'active' ? 'Kích hoạt' : 'Vô hiệu hóa';
                         $roleClass = 'role-' . $u['role'];
                     ?>
                         <tr class="<?php echo $roleClass; ?>">
@@ -134,7 +131,6 @@
                             <td><?php echo htmlspecialchars($u['email']); ?></td>
                             <td><?php echo htmlspecialchars($u['fullname']); ?></td>
                             <td><?php echo $roleText; ?></td>
-                            <td class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></td>
                             <td><?php echo htmlspecialchars($u['created_at'] ?? 'N/A'); ?></td>
                             <td>
                                 <a href="<?php echo BASE_URL; ?>/admin/editUser?id=<?php echo $u['id']; ?>" class="btn btn-edit">Chỉnh sửa</a>
