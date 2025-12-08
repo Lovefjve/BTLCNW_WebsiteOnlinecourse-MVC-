@@ -8,24 +8,42 @@ class Database {
     private $conn;
     
     public function getConnection() {
+        $this->conn = null;
+        
         try {
             $this->conn = new PDO(
-                "mysql:host=$this->host;dbname=$this->db_name;charset=utf8mb4",
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
                 $this->username,
                 $this->password,
                 [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES => false, // QUAN TRỌNG: tắt emulation để tăng performance
-                    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
+                    PDO::ATTR_EMULATE_PREPARES => false
                 ]
             );
+            
+            // Test query
+            $this->conn->query("SELECT 1");
+            
         } catch(PDOException $e) {
-            // Hiển thị lỗi rõ ràng
-            die("Lỗi kết nối database: " . $e->getMessage() . 
-                "<br>Host: $this->host<br>DB: $this->db_name<br>User: $this->username");
+            // Hiển thị lỗi chi tiết
+            die("
+                <div style='background: #f8d7da; color: #721c24; padding: 20px; border-radius: 5px; margin: 20px;'>
+                    <h3>❌ Lỗi kết nối database</h3>
+                    <p><strong>Chi tiết:</strong> " . $e->getMessage() . "</p>
+                    <p><strong>Database:</strong> {$this->db_name}</p>
+                    <p><strong>Username:</strong> {$this->username}</p>
+                    <p>Hãy kiểm tra:</p>
+                    <ol>
+                        <li>XAMPP có đang chạy MySQL không?</li>
+                        <li>Database '{$this->db_name}' có tồn tại không?</li>
+                        <li>Tên database có đúng không?</li>
+                    </ol>
+                </div>
+            ");
         }
         
         return $this->conn;
     }
 }
+?>

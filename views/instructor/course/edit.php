@@ -228,7 +228,6 @@ $root_path = '../../';
                 <div class="form-group">
                     <label for="status">Trạng thái</label>
                     <select id="status" name="status">
-                        <option value="draft" <?php echo $course['status'] == 'draft' ? 'selected' : ''; ?>>Bản nháp</option>
                         <option value="pending" <?php echo $course['status'] == 'pending' ? 'selected' : ''; ?>>Chờ duyệt</option>
                         <option value="published" <?php echo $course['status'] == 'published' ? 'selected' : ''; ?>>Đã xuất bản</option>
                     </select>

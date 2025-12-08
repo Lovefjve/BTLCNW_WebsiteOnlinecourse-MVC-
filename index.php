@@ -1,26 +1,29 @@
 <?php
 // index.php
+
+// Bật lỗi để debug
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Start session
-session_start();
+// Bật session (CHỈ Ở ĐÂY)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Get controller and action
+// Xử lý routing
 $controller = $_GET['c'] ?? 'instructor';
-$action = $_GET['a'] ?? 'course';
+$action = $_GET['a'] ?? 'courses';
 
-// Simple routing
 if ($controller === 'instructor') {
     // Include controller
     require_once 'controllers/InstructorController.php';
     
-    // Create instance
+    // Tạo instance
     $instructorController = new InstructorController();
     
-    // Map actions to methods
+    // Map actions
     $actionMap = [
-        'course' => 'course',
+        'courses' => 'courses',
         'createCourse' => 'createCourse',
         'storeCourse' => 'storeCourse',
         'edit' => 'editCourse',
@@ -28,19 +31,15 @@ if ($controller === 'instructor') {
         'delete' => 'deleteCourse'
     ];
     
-    // Get method name
-    $method = $actionMap[$action] ?? 'course';
+    // Gọi phương thức
+    $method = $actionMap[$action] ?? 'courses';
     
-    // Check if method exists
     if (method_exists($instructorController, $method)) {
         $instructorController->$method();
     } else {
-        // Default to courses
-        $instructorController->courses();
+        echo "Lỗi: Phương thức '$method' không tồn tại";
     }
 } else {
-    // Default to instructor courses
-    header('Location: ?c=instructor&a=course');
-    exit;
+    echo "Lỗi: Controller '$controller' không tồn tại";
 }
 ?>
