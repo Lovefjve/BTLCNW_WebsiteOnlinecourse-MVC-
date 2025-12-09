@@ -14,7 +14,6 @@ class Course {
     // SỬA LẠI: Lấy khóa học của giảng viên
     public function getByInstructor($instructor_id, $limit = 10, $offset = 0) {
         try {
-            // SỬA QUERY: Bỏ GROUP BY phức tạp, dùng subquery cho student_count
             $query = "SELECT 
                         c.*, 
                         cat.name as category_name,

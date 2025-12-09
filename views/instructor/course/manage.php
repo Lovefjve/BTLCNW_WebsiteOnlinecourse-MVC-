@@ -424,9 +424,9 @@ $root_path = '../../';
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <a href="#" target="_blank"
-                                        class="btn-action btn-view" title="Xem trước">
-                                        <i class="fas fa-eye"></i>
+                                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>"
+                                        class="btn-action btn-view" title="Quản lý bài học">
+                                        <i class="fas fa-book-open"></i> 
                                     </a>
 
                                     <a href="?c=instructor&a=students&course_id=<?php echo $course['id']; ?>"

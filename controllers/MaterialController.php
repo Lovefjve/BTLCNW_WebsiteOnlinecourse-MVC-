@@ -1,200 +1,474 @@
 <?php
+// controllers/MaterialController.php
+
 class MaterialController {
-    private $db;
-    private $materialModel;
-    private $lessonModel;
-    private $courseModel;
-
-    public function __construct() {
-        $database = new Database();
-        $this->db = $database->getConnection();
-        $this->materialModel = new Material($this->db);
-        $this->lessonModel = new Lesson($this->db);
-        $this->courseModel = new Course($this->db);
+    
+    public function index() {
+        // Kiểm tra quyền
+        if (($_SESSION['role'] ?? 0) != 1) {
+            $_SESSION['error'] = "Bạn không có quyền truy cập";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        // Lấy lesson_id từ URL
+        $lesson_id = $_GET['lesson_id'] ?? 0;
+        
+        if (!$lesson_id) {
+            $_SESSION['error'] = "Không tìm thấy bài học";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        // Load models
+        require_once 'models/Course.php';
+        require_once 'models/Lesson.php';
+        require_once 'models/Material.php';
+        
+        $courseModel = new Course();
+        $lessonModel = new Lesson();
+        $materialModel = new Material();
+        
+        try {
+            // Lấy thông tin bài học
+            $lesson = $lessonModel->getById($lesson_id);
+            
+            if (!$lesson) {
+                $_SESSION['error'] = "Bài học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Lấy thông tin khóa học
+            $course = $courseModel->getById($lesson['course_id']);
+            
+            if (!$course) {
+                $_SESSION['error'] = "Khóa học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Kiểm tra quyền sở hữu
+            if ($course['instructor_id'] != $_SESSION['user_id']) {
+                $_SESSION['error'] = "Bạn không có quyền quản lý tài liệu bài học này";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Lấy danh sách tài liệu
+            $materials = $materialModel->getByLesson($lesson_id);
+            
+            // Thống kê
+            $total_materials = count($materials);
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
+            header('Location: ?c=lesson&a=index&course_id=' . ($lesson['course_id'] ?? 0));
+            exit;
+        }
+        
+        // Hiển thị view - TRUYỀN BIẾN ĐẦY ĐỦ theo đúng tên biến view cần
+        $data = [
+            'course' => $course,
+            'course_title' => $course['title'] ?? 'Khóa học',
+            'course_id' => $course['id'],
+            'lesson' => $lesson,
+            'lesson_title' => $lesson['title'] ?? 'Bài học',
+            'lesson_id' => $lesson_id,
+            'materials' => $materials,
+            'total_materials' => $total_materials,
+        ];
+        
+        // Dùng extract() để chuyển mảng thành biến
+        extract($data);
+        
+        // Kiểm tra file view tồn tại
+        $view_file = 'views/instructor/materials/upload.php';
+        if (!file_exists($view_file)) {
+            die("View file không tồn tại: $view_file");
+        }
+        
+        require_once $view_file;
     }
-
-    /**
-     * Upload tài liệu cho bài học
-     */
-    public function upload($course_id, $lesson_id) {
-        // LƯU Ý: Check quyền giảng viên - do lập trình viên A làm
+    
+    public function upload() {
+        // Kiểm tra quyền
+        if (($_SESSION['role'] ?? 0) != 1) {
+            $_SESSION['error'] = "Bạn không có quyền truy cập";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        // Lấy lesson_id từ URL
+        $lesson_id = $_GET['lesson_id'] ?? 0;
+        
+        if (!$lesson_id) {
+            $_SESSION['error'] = "Không tìm thấy bài học";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        // Load models
+        require_once 'models/Course.php';
+        require_once 'models/Lesson.php';
+        require_once 'models/Material.php';
+        
+        $courseModel = new Course();
+        $lessonModel = new Lesson();
+        $materialModel = new Material();
+        
+        // KHỞI TẠO BIẾN
+        $errors = [];
+        $old_input = [];
+        
+        try {
+            // Lấy thông tin bài học
+            $lesson = $lessonModel->getById($lesson_id);
+            
+            if (!$lesson) {
+                $_SESSION['error'] = "Bài học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Lấy thông tin khóa học
+            $course = $courseModel->getById($lesson['course_id']);
+            
+            if (!$course) {
+                $_SESSION['error'] = "Khóa học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Kiểm tra quyền sở hữu
+            if ($course['instructor_id'] != $_SESSION['user_id']) {
+                $_SESSION['error'] = "Bạn không có quyền upload tài liệu cho bài học này";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Lấy errors và old input từ session
+            $errors = $_SESSION['errors'] ?? [];
+            $old_input = $_SESSION['old_input'] ?? [];
+            
+            // Xóa session data sau khi dùng
+            unset($_SESSION['errors']);
+            unset($_SESSION['old_input']);
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
+            header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
+            exit;
+        }
+        
+        // Hiển thị view
+        $data = [
+            'course' => $course,
+            'lesson' => $lesson,
+            'errors' => $errors,
+            'old_input' => $old_input
+        ];
+        
+        extract($data);
+        
+        // Kiểm tra file view tồn tại
+        $view_file = 'views/instructor/materials/upload.php';
+        if (!file_exists($view_file)) {
+            die("View file không tồn tại: $view_file");
+        }
+        
+        require_once $view_file;
+    }
+    
+    public function store() {
+        // Kiểm tra quyền
+        if (($_SESSION['role'] ?? 0) != 1) {
+            $_SESSION['error'] = "Bạn không có quyền thực hiện";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Phương thức không hợp lệ']);
+            $_SESSION['error'] = "Phương thức không hợp lệ";
+            header('Location: ?c=instructor&a=courses');
             exit;
         }
         
-        $instructor_id = $_SESSION['user_id'];
+        $lesson_id = (int)($_POST['lesson_id'] ?? 0);
         
-        // Kiểm tra quyền sở hữu bài học
-        if (!$this->lessonModel->isLessonOwner($lesson_id, $instructor_id)) {
-            echo json_encode(['success' => false, 'message' => 'Bạn không có quyền upload tài liệu cho bài học này']);
+        if (!$lesson_id) {
+            $_SESSION['error'] = "Không tìm thấy bài học";
+            header('Location: ?c=instructor&a=courses');
             exit;
         }
         
-        // Kiểm tra file upload
-        if (!isset($_FILES['file']) || $_FILES['file']['error'] != 0) {
-            echo json_encode(['success' => false, 'message' => 'Vui lòng chọn file để upload']);
+        // Validation
+        $errors = $this->validateMaterialData($_FILES);
+        
+        if (!empty($errors)) {
+            $_SESSION['errors'] = $errors;
+            $_SESSION['old_input'] = $_POST;
+            header('Location: ?c=material&a=upload&lesson_id=' . $lesson_id);
             exit;
         }
         
-        $file = $_FILES['file'];
-        $file_name = $file['name'];
-        $file_tmp = $file['tmp_name'];
-        $file_size = $file['size'];
-        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        // Load models
+        require_once 'models/Course.php';
+        require_once 'models/Lesson.php';
+        require_once 'models/Material.php';
         
-        // Kiểm tra loại file
-        $allowed_types = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip', 'rar'];
-        if (!in_array($file_ext, $allowed_types)) {
-            echo json_encode(['success' => false, 'message' => 'Loại file không được hỗ trợ. Chỉ chấp nhận: ' . implode(', ', $allowed_types)]);
-            exit;
-        }
+        $courseModel = new Course();
+        $lessonModel = new Lesson();
+        $materialModel = new Material();
         
-        // Kiểm tra kích thước file (max 10MB)
-        $max_size = 10 * 1024 * 1024;
-        if ($file_size > $max_size) {
-            echo json_encode(['success' => false, 'message' => 'Kích thước file quá lớn (tối đa 10MB)']);
-            exit;
-        }
-        
-        // Tạo thư mục upload nếu chưa tồn tại
-        $upload_dir = __DIR__ . '/../assets/uploads/materials/';
-        if (!file_exists($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-        
-        // Tạo tên file mới để tránh trùng lặp
-        $new_filename = time() . '_' . uniqid() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file_name);
-        $upload_path = $upload_dir . $new_filename;
-        
-        // Di chuyển file
-        if (move_uploaded_file($file_tmp, $upload_path)) {
-            // Lưu thông tin vào database
-            $this->materialModel->lesson_id = $lesson_id;
-            $this->materialModel->filename = $file_name;
-            $this->materialModel->file_path = $new_filename;
-            $this->materialModel->file_type = $file_ext;
-            $this->materialModel->file_size = $file_size;
+        try {
+            // Lấy thông tin bài học
+            $lesson = $lessonModel->getById($lesson_id);
             
-            if ($material_id = $this->materialModel->create()) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Upload tài liệu thành công',
-                    'material' => [
-                        'id' => $material_id,
-                        'filename' => $file_name,
-                        'file_type' => $file_ext,
-                        'file_size' => $this->formatFileSize($file_size),
-                        'uploaded_at' => date('d/m/Y H:i')
-                    ]
-                ]);
+            if (!$lesson) {
+                $_SESSION['error'] = "Bài học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
                 exit;
+            }
+            
+            // Kiểm tra quyền sở hữu (qua course)
+            $course = $courseModel->getById($lesson['course_id']);
+            
+            if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
+                $_SESSION['error'] = "Bạn không có quyền upload tài liệu cho bài học này";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Xử lý upload
+            $uploaded_count = 0;
+            $upload_errors = [];
+            
+            if (isset($_FILES['materials']) && count($_FILES['materials']['name']) > 0) {
+                for ($i = 0; $i < count($_FILES['materials']['name']); $i++) {
+                    if ($_FILES['materials']['error'][$i] === UPLOAD_ERR_OK) {
+                        $file_data = [
+                            'name' => $_FILES['materials']['name'][$i],
+                            'tmp_name' => $_FILES['materials']['tmp_name'][$i],
+                            'size' => $_FILES['materials']['size'][$i],
+                            'type' => $_FILES['materials']['type'][$i]
+                        ];
+                        
+                        if ($materialModel->upload($lesson_id, $file_data)) {
+                            $uploaded_count++;
+                        } else {
+                            $upload_errors[] = "Không thể upload file: " . $file_data['name'];
+                        }
+                    } elseif ($_FILES['materials']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+                        $upload_errors[] = "Lỗi upload file: " . $_FILES['materials']['name'][$i];
+                    }
+                }
+            } else {
+                $_SESSION['error'] = "Vui lòng chọn ít nhất một file để upload";
+                header('Location: ?c=material&a=upload&lesson_id=' . $lesson_id);
+                exit;
+            }
+            
+            if ($uploaded_count > 0) {
+                $_SESSION['success'] = "Đã upload thành công $uploaded_count tài liệu!";
+            }
+            
+            if (!empty($upload_errors)) {
+                $_SESSION['error'] = implode("<br>", $upload_errors);
+            }
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
+        }
+        
+        header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
+        exit;
+    }
+    
+    public function edit() {
+        // Nếu bạn muốn có chức năng chỉnh sửa thông tin tài liệu (đổi tên, mô tả, v.v.)
+        // Thêm method này tương tự như lesson edit
+        $_SESSION['error'] = "Chức năng đang được phát triển";
+        header('Location: ?c=material&a=index&lesson_id=' . ($_GET['lesson_id'] ?? 0));
+        exit;
+    }
+    
+    public function update() {
+        // Nếu bạn muốn có chức năng cập nhật thông tin tài liệu
+        $_SESSION['error'] = "Chức năng đang được phát triển";
+        header('Location: ?c=material&a=index&lesson_id=' . ($_POST['lesson_id'] ?? 0));
+        exit;
+    }
+    
+    public function delete() {
+        // Kiểm tra quyền
+        if (($_SESSION['role'] ?? 0) != 1) {
+            $_SESSION['error'] = "Bạn không có quyền thực hiện";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $_SESSION['error'] = "Phương thức không hợp lệ";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        $material_id = (int)($_POST['material_id'] ?? 0);
+        $lesson_id = (int)($_POST['lesson_id'] ?? 0);
+        
+        if (!$material_id || !$lesson_id) {
+            $_SESSION['error'] = "Không tìm thấy tài liệu";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        // Load models
+        require_once 'models/Course.php';
+        require_once 'models/Lesson.php';
+        require_once 'models/Material.php';
+        
+        $courseModel = new Course();
+        $lessonModel = new Lesson();
+        $materialModel = new Material();
+        
+        try {
+            // Lấy thông tin bài học
+            $lesson = $lessonModel->getById($lesson_id);
+            
+            if (!$lesson) {
+                $_SESSION['error'] = "Bài học không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Kiểm tra quyền sở hữu (qua course)
+            $course = $courseModel->getById($lesson['course_id']);
+            
+            if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
+                $_SESSION['error'] = "Bạn không có quyền xóa tài liệu này";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            // Kiểm tra tài liệu tồn tại và thuộc bài học
+            $material = $materialModel->getById($material_id);
+            
+            if (!$material) {
+                $_SESSION['error'] = "Tài liệu không tồn tại";
+                header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
+                exit;
+            }
+            
+            if ($material['lesson_id'] != $lesson_id) {
+                $_SESSION['error'] = "Tài liệu không thuộc bài học này";
+                header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
+                exit;
+            }
+            
+            // Xóa tài liệu
+            if ($materialModel->delete($material_id)) {
+                $_SESSION['success'] = "Xóa tài liệu thành công!";
+            } else {
+                $_SESSION['error'] = "Có lỗi xảy ra khi xóa tài liệu";
+            }
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
+        }
+        
+        header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
+        exit;
+    }
+    
+    public function download() {
+        // Kiểm tra quyền (cho phép học viên download nếu đã enrolled)
+        // Ở đây tôi chỉ kiểm tra đăng nhập
+        if (!isset($_SESSION['user_id'])) {
+            $_SESSION['error'] = "Vui lòng đăng nhập để download tài liệu";
+            header('Location: ?c=auth&a=login');
+            exit;
+        }
+        
+        $material_id = $_GET['id'] ?? 0;
+        
+        if (!$material_id) {
+            $_SESSION['error'] = "Không tìm thấy tài liệu";
+            header('Location: ?c=instructor&a=courses');
+            exit;
+        }
+        
+        require_once 'models/Material.php';
+        $materialModel = new Material();
+        
+        try {
+            $material = $materialModel->getById($material_id);
+            
+            if (!$material) {
+                $_SESSION['error'] = "Tài liệu không tồn tại";
+                header('Location: ?c=instructor&a=courses');
+                exit;
+            }
+            
+            $file_path = $material['file_path'];
+            
+            if (!file_exists($file_path)) {
+                $_SESSION['error'] = "File không tồn tại trên server";
+                header('Location: ?c=material&a=index&lesson_id=' . $material['lesson_id']);
+                exit;
+            }
+            
+            // Thiết lập headers để download
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($material['filename']) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file_path));
+            readfile($file_path);
+            exit;
+            
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
+            header('Location: ?c=material&a=index&lesson_id=' . ($material['lesson_id'] ?? 0));
+            exit;
+        }
+    }
+    
+    // VALIDATE DỮ LIỆU MATERIAL
+    private function validateMaterialData($files) {
+        $errors = [];
+        
+        if (!isset($files['materials']) || count($files['materials']['name']) == 0) {
+            $errors['materials'] = "Vui lòng chọn ít nhất một file";
+            return $errors;
+        }
+        
+        // Kiểm tra từng file
+        $allowed_extensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', 'rar', 'txt', 'jpg', 'jpeg', 'png', 'gif'];
+        $max_file_size = 50 * 1024 * 1024; // 50MB
+        
+        for ($i = 0; $i < count($files['materials']['name']); $i++) {
+            if ($files['materials']['error'][$i] !== UPLOAD_ERR_OK) {
+                if ($files['materials']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+                    $errors['materials'] = "Có lỗi xảy ra khi upload file: " . $files['materials']['name'][$i];
+                }
+                continue;
+            }
+            
+            // Kiểm tra kích thước
+            if ($files['materials']['size'][$i] > $max_file_size) {
+                $errors['materials'] = "File '" . $files['materials']['name'][$i] . "' vượt quá kích thước 50MB cho phép";
+            }
+            
+            // Kiểm tra định dạng
+            $file_extension = strtolower(pathinfo($files['materials']['name'][$i], PATHINFO_EXTENSION));
+            if (!in_array($file_extension, $allowed_extensions)) {
+                $errors['materials'] = "File '" . $files['materials']['name'][$i] . "' có định dạng không được hỗ trợ";
             }
         }
         
-        echo json_encode(['success' => false, 'message' => 'Có lỗi xảy ra khi upload file']);
-        exit;
-    }
-
-    /**
-     * Xóa tài liệu
-     */
-    public function delete($material_id) {
-        // LƯU Ý: Check quyền giảng viên và CSRF token - do lập trình viên A làm
-        
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $_SESSION['error'] = 'Phương thức không hợp lệ';
-            header('Location: /instructor/courses');
-            exit;
-        }
-        
-        $instructor_id = $_SESSION['user_id'];
-        
-        // Kiểm tra quyền sở hữu tài liệu
-        if (!$this->materialModel->isMaterialOwner($material_id, $instructor_id)) {
-            $_SESSION['error'] = 'Bạn không có quyền xóa tài liệu này';
-            header('Location: /instructor/courses');
-            exit;
-        }
-        
-        // Lấy thông tin tài liệu
-        $material = $this->materialModel->readOne($material_id);
-        if (!$material) {
-            $_SESSION['error'] = 'Tài liệu không tồn tại';
-            header('Location: /instructor/courses');
-            exit;
-        }
-        
-        // Xóa file vật lý
-        $file_path = __DIR__ . '/../assets/uploads/materials/' . $material['file_path'];
-        if (file_exists($file_path)) {
-            unlink($file_path);
-        }
-        
-        // Xóa record trong database
-        $this->materialModel->id = $material_id;
-        
-        if ($this->materialModel->delete()) {
-            $_SESSION['success'] = 'Xóa tài liệu thành công!';
-        } else {
-            $_SESSION['error'] = 'Có lỗi xảy ra khi xóa tài liệu';
-        }
-        
-        header('Location: /instructor/courses/' . $material['course_id'] . '/lessons/' . $material['lesson_id'] . '/edit');
-        exit;
-    }
-
-    /**
-     * Download tài liệu
-     */
-    public function download($material_id) {
-        // Kiểm tra quyền truy cập tài liệu
-        // Nếu là học viên: kiểm tra xem đã đăng ký khóa học chưa
-        // Nếu là giảng viên: kiểm tra quyền sở hữu
-        // LƯU Ý: Phần này do lập trình viên A làm
-        
-        $material = $this->materialModel->readOne($material_id);
-        if (!$material) {
-            $_SESSION['error'] = 'Tài liệu không tồn tại';
-            header('Location: /');
-            exit;
-        }
-        
-        $file_path = __DIR__ . '/../assets/uploads/materials/' . $material['file_path'];
-        
-        if (!file_exists($file_path)) {
-            $_SESSION['error'] = 'File không tồn tại trên server';
-            header('Location: /');
-            exit;
-        }
-        
-        // Thiết lập headers cho download
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $material['filename'] . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($file_path));
-        
-        readfile($file_path);
-        exit;
-    }
-
-    /**
-     * Format kích thước file
-     */
-    private function formatFileSize($bytes) {
-        if ($bytes >= 1073741824) {
-            return number_format($bytes / 1073741824, 2) . ' GB';
-        } elseif ($bytes >= 1048576) {
-            return number_format($bytes / 1048576, 2) . ' MB';
-        } elseif ($bytes >= 1024) {
-            return number_format($bytes / 1024, 2) . ' KB';
-        } else {
-            return $bytes . ' bytes';
-        }
+        return $errors;
     }
 }
-?>
