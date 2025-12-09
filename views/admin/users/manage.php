@@ -107,6 +107,11 @@
             margin: 0;
             flex: 1;
         }
+            .top-actions { display:flex; gap:10px; justify-content:flex-end; margin-bottom:10px; }
+            .btn-secondary { background:#6c757d; color:white; padding:8px 14px; border-radius:6px; text-decoration:none; }
+            .btn-secondary:hover { background:#5a6268; }
+            .btn-logout { background:#dc3545; color:white; padding:8px 14px; border-radius:6px; text-decoration:none; }
+            .btn-logout:hover { background:#c82333; }
         .success-message {
             background-color: #d4edda;
             color: #155724;
@@ -140,7 +145,10 @@
             <a href="<?php echo BASE_URL; ?>/admin/createUser" class="btn btn-create">+ Tạo tài khoản mới</a>
         </div>
         
-        <p><a href="<?php echo BASE_URL; ?>/admin/dashboard">← Về Dashboard</a> | <a href="<?php echo BASE_URL; ?>/auth/logout">Đăng xuất</a></p>
+        <div class="top-actions">
+            <a href="<?php echo BASE_URL; ?>/admin/dashboard" class="btn btn-secondary">← Về Dashboard</a>
+            <a href="<?php echo BASE_URL; ?>/auth/logout" class="btn btn-logout">🚪 Đăng xuất</a>
+        </div>
 
         <?php if (isset($_GET['success'])): ?>
             <?php if ($_GET['success'] === 'created'): ?>

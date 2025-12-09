@@ -210,24 +210,24 @@
         
         <div class="dashboard-grid">
             <!-- Quản lý người dùng -->
-            <div class="dashboard-card card-users">
+            <a href="<?php echo BASE_URL; ?>/admin/users" class="dashboard-card card-users" style="text-decoration:none; color:inherit; display:block;">
                 <div class="card-icon">👥</div>
                 <div class="card-content">
                     <h3>Quản lý Người dùng</h3>
                     <p>Quản lý tài khoản sinh viên, giáo viên và quản trị viên trong hệ thống</p>
-                    <a href="<?php echo BASE_URL; ?>/admin/users" class="card-link">Mở →</a>
+                    <span class="card-link">Mở →</span>
                 </div>
-            </div>
+            </a>
             
             <!-- Quản lý danh mục khóa học -->
-            <div class="dashboard-card card-categories">
+            <a href="<?php echo BASE_URL; ?>/admin/categories" class="dashboard-card card-categories" style="text-decoration:none; color:inherit; display:block;">
                 <div class="card-icon">📚</div>
                 <div class="card-content">
                     <h3>Quản lý Danh mục</h3>
                     <p>Tạo, sửa, xóa các danh mục khóa học để tổ chức nội dung</p>
-                    <button class="card-link disabled">Sắp ra mắt 🔒</button>
+                    <span class="card-link">Mở →</span>
                 </div>
-            </div>
+            </a>
             
             <!-- Xem thống kê -->
             <div class="dashboard-card card-stats">
