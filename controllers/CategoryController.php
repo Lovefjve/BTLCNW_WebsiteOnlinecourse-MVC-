@@ -32,30 +32,21 @@ class CategoryController {
             exit;
         }
 
-        $errors = [];
-        $data = ['name' => '', 'slug' => ''];
+    $errors = [];
+    $data = ['name' => '', 'description' => ''];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data['name'] = trim($_POST['name'] ?? '');
-            $data['slug'] = trim($_POST['slug'] ?? '');
+            $data['description'] = trim($_POST['description'] ?? '');
 
             if (empty($data['name'])) {
                 $errors['name'] = 'Vui lòng nhập tên danh mục';
             }
 
-            // Generate slug if empty
-            if (empty($data['slug'])) {
-                $data['slug'] = $this->categoryModel->slugify($data['name']);
-            }
-
-            // Check uniqueness
+            // Check uniqueness by name only
             $existsByName = $this->categoryModel->findByName($data['name']);
-            $existsBySlug = $this->categoryModel->findBySlug($data['slug']);
             if ($existsByName) {
                 $errors['name'] = 'Tên danh mục đã tồn tại';
-            }
-            if ($existsBySlug) {
-                $errors['slug'] = 'Slug đã tồn tại, hãy sửa hoặc nhập slug khác';
             }
 
             if (empty($errors)) {
@@ -96,23 +87,15 @@ class CategoryController {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data['name'] = trim($_POST['name'] ?? '');
-            $data['slug'] = trim($_POST['slug'] ?? '');
+            $data['description'] = trim($_POST['description'] ?? '');
 
             if (empty($data['name'])) {
                 $errors['name'] = 'Vui lòng nhập tên danh mục';
             }
 
-            if (empty($data['slug'])) {
-                $data['slug'] = $this->categoryModel->slugify($data['name']);
-            }
-
             $existsByName = $this->categoryModel->findByName($data['name']);
             if ($existsByName && $existsByName['id'] != $id) {
                 $errors['name'] = 'Tên danh mục đã tồn tại';
-            }
-            $existsBySlug = $this->categoryModel->findBySlug($data['slug']);
-            if ($existsBySlug && $existsBySlug['id'] != $id) {
-                $errors['slug'] = 'Slug đã tồn tại';
             }
 
             if (empty($errors)) {

@@ -70,19 +70,15 @@
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
         .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 16px;
-            background-color: #6c757d;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            display: none;
         }
-        .back-link:hover {
-            background-color: #5a6268;
-            text-decoration: none;
-        }
+        .form-actions { display:flex; gap:12px; justify-content:space-between; align-items:center; margin-top:18px; }
+        .actions-left { display:flex; gap:12px; align-items:center; }
+        .btn { padding:10px 16px; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block; border:0; cursor:pointer; }
+        .btn-back { background:#6c757d; color:white; }
+        .btn-back:hover { background:#5a6268; }
+        .btn-save { background:linear-gradient(180deg,#007bff,#0056b3); color:white; box-shadow:0 6px 18px rgba(0,123,255,0.14); }
+        .btn-save:hover { transform:translateY(-2px); }
         .db-error {
             background-color: #f8d7da;
             color: #721c24;
@@ -111,7 +107,6 @@
 <body>
     <div class="container">
         <div class="form-container">
-            <a href="<?php echo BASE_URL; ?>/admin/users" class="back-link">← Quay lại danh sách</a>
             <h2>Chỉnh sửa Tài khoản</h2>
 
             <?php if (!empty($errors['db'])): ?>
@@ -159,7 +154,14 @@
                     </select>
                 </div>
 
-                <button type="submit">Cập nhật Tài khoản</button>
+                <div class="form-actions">
+                    <div class="actions-left">
+                        <a href="<?php echo BASE_URL; ?>/admin/users" class="btn btn-back">Hủy</a>
+                    </div>
+                    <div>
+                        <button class="btn btn-save" type="submit">Cập nhật Tài khoản</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

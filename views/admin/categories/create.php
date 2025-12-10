@@ -9,15 +9,27 @@
     <title>Tạo Danh mục - Admin</title>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/style.css">
     <style>
-        .form-container { max-width:600px; margin:30px auto; padding:25px; background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
-        .form-group { margin-bottom:15px; }
-        label { display:block; font-weight:600; margin-bottom:6px; }
-        input { width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; }
+        body { background: #f4f6f8; }
+        .form-container { max-width:720px; margin:36px auto; padding:28px; background:white; border-radius:10px; box-shadow:0 6px 20px rgba(27,31,35,0.06); }
+        .form-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+        .form-header h2 { margin:0; font-size:1.25rem; color:#222; }
+        .form-group { margin-bottom:16px; }
+        label { display:block; font-weight:600; margin-bottom:8px; color:#333; }
+        input, textarea { width:100%; padding:12px; border:1px solid #e3e6ea; border-radius:8px; background:#fff; font-size:14px; color:#222; }
+        textarea { min-height:110px; resize:vertical; }
         .error { color:#dc3545; font-size:13px; margin-top:6px; }
-        .btn { padding:10px 18px; border-radius:6px; text-decoration:none; font-weight:600; }
-        .btn-primary { background:#007bff; color:white; border:none; }
-        .btn-primary:hover { background:#0056b3; }
-        .back { margin-right:10px; background:#6c757d; color:white; }
+        .form-actions { display:flex; gap:12px; justify-content:space-between; align-items:center; margin-top:18px; }
+        .actions-left { display:flex; gap:12px; align-items:center; }
+        .btn { padding:10px 16px; border-radius:8px; text-decoration:none; font-weight:700; display:inline-block; border:0; cursor:pointer; }
+        .btn-back { background:#6c757d; color:white; }
+        .btn-back:hover { background:#5a6268; }
+        .btn-save { background:linear-gradient(180deg,#007bff,#0056b3); color:white; box-shadow:0 6px 18px rgba(0,123,255,0.14); }
+        .btn-save:hover { transform:translateY(-2px); }
+        .helper { color:#6b7280; font-size:13px; }
+        @media (max-width:600px) {
+            .form-actions { flex-direction:column-reverse; align-items:stretch; }
+            .actions-left { justify-content:flex-start; }
+        }
     </style>
 </head>
 <body>
@@ -33,16 +45,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="slug">Slug (để trống để tự tạo)</label>
-                    <input type="text" id="slug" name="slug" value="<?php echo htmlspecialchars($data['slug'] ?? ''); ?>">
-                    <?php if (!empty($errors['slug'])): ?><div class="error"><?php echo $errors['slug']; ?></div><?php endif; ?>
+                    <label for="description">Mô tả (tùy chọn)</label>
+                    <textarea id="description" name="description" rows="4" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px"><?php echo htmlspecialchars($data['description'] ?? ''); ?></textarea>
+                    <?php if (!empty($errors['description'])): ?><div class="error"><?php echo $errors['description']; ?></div><?php endif; ?>
                 </div>
 
-                <div style="display:flex; gap:10px;">
-                 <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
-                    <a href="<?php echo BASE_URL; ?>/admin/categories" class="btn btn-secondary">← Về danh sách</a>
-                    <button class="btn btn-primary" type="submit">Tạo danh mục</button>
+                <div class="form-actions">
+                    <div class="actions-left">
+                        <a href="<?php echo BASE_URL; ?>/admin/categories" class="btn btn-back">Hủy</a>
+                    </div>
+                    <div>
+                        <button class="btn btn-save" type="submit">Tạo danh mục</button>
+                    </div>
                 </div>
+            </form>
             </form>
         </div>
     </div>

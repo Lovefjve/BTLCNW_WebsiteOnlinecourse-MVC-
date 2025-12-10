@@ -56,7 +56,7 @@
                     <tr>
                         <th>#</th>
                         <th>Tên</th>
-                        <th>Slug</th>
+                        <th>Mô tả</th>
                         <th>Ngày tạo</th>
                         <th>Hành động</th>
                     </tr>
@@ -66,7 +66,7 @@
                         <tr>
                             <td><?php echo htmlspecialchars($c['id']); ?></td>
                             <td><?php echo htmlspecialchars($c['name']); ?></td>
-                            <td><?php echo htmlspecialchars($c['slug']); ?></td>
+                            <td><?php echo htmlspecialchars($c['description']); ?></td>
                             <td><?php echo htmlspecialchars($c['created_at']); ?></td>
                             <td class="actions">
                                 <a class="btn-edit" href="<?php echo BASE_URL; ?>/admin/categories/edit?id=<?php echo $c['id']; ?>">Sửa</a>

@@ -28,30 +28,22 @@ class Category extends Model {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // Tìm theo slug
-    public function findBySlug($slug) {
-        $query = 'SELECT * FROM categories WHERE slug = :slug LIMIT 1';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':slug', $slug);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
 
     // Tạo danh mục mới
     public function create($data) {
-        $query = 'INSERT INTO categories (name, slug) VALUES (:name, :slug)';
+        $query = 'INSERT INTO categories (name, description) VALUES (:name, :description)';
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':slug', $data['slug']);
+        $stmt->bindParam(':description', $data['description']);
         return $stmt->execute();
     }
 
     // Cập nhật danh mục
     public function update($id, $data) {
-        $query = 'UPDATE categories SET name = :name, slug = :slug WHERE id = :id';
+        $query = 'UPDATE categories SET name = :name, description = :description WHERE id = :id';
         $stmt = $this->db->prepare($query);
         $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':slug', $data['slug']);
+        $stmt->bindParam(':description', $data['description']);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
@@ -64,25 +56,5 @@ class Category extends Model {
         return $stmt->execute();
     }
 
-    // Tạo slug từ tên
-    public function slugify($text) {
-        // replace non letter or digits by -
-        $text = preg_replace('~[^\r\n\\pL\\pN]+~u', '-', $text);
-        // transliterate
-        if (function_exists('iconv')) {
-            $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-        }
-        // remove unwanted characters
-        $text = preg_replace('~[^-\\w]+~', '', $text);
-        // trim
-        $text = trim($text, '-');
-        // remove duplicate -
-        $text = preg_replace('~-+~', '-', $text);
-        // lowercase
-        $text = strtolower($text);
-        if (empty($text)) {
-            return 'n-a';
-        }
-        return $text;
-    }
+    // (No slugify needed with current schema)
 }
