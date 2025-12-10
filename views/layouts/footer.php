@@ -1,6 +1,7 @@
 <div class="footer">
-    © 2025 Online Academy – All Rights Reserved
-</div>
-
+      <div class="footer-bottom">
+        <p>&copy; 2025 EduLearn. Tất cả quyền được bảo lưu.</p>
+      </div>
+    </div>
 </body>
 </html>

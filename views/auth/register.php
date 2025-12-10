@@ -1,20 +1,41 @@
-<?php require_once __DIR__ . "/../layouts/header.php"; ?>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body data-page="register">
+  <main class="page-center">
+    <h1>Đăng ký</h1>
 
-<div class="auth-container">
-    <h2>Đăng ký</h2>
+    <form class="login-container register-container" id="registerForm" action="/register" method="POST" novalidate>
+      <label for="name">Họ và tên</label>
+      <input id="name" name="name" type="text" required>
 
-    <form action="/auth/register" method="POST">
-        <label>Họ tên</label>
-        <input type="text" name="fullname" required>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+      <label for="password">Mật khẩu</label>
+      <input id="password" name="password" type="password" minlength="6" required>
 
-        <label>Mật khẩu</label>
-        <input type="password" name="password" required>
+      <label for="confirm">Xác nhận mật khẩu</label>
+      <input id="confirm" name="confirm" type="password" minlength="6" required>
 
-        <button type="submit">Tạo tài khoản</button>
+      <label class="checkbox">
+        <input type="checkbox" name="terms" required>
+        Tôi đồng ý với <a href="#">Điều khoản sử dụng</a>
+      </label>
+
+      <button type="submit">Đăng ký</button>
+
+      <p class="form-footer">
+        Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+      </p>
     </form>
-</div>
+  </main>
 
-<?php require_once __DIR__ . "/../layouts/footer.php"; ?>
+  <script src="main.js" defer></script>
+</body>
+</html>

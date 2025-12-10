@@ -1,53 +1,513 @@
-body {
-    margin: 0;
-    background: #fff;
-    font-family: Arial;
+/* ===== HEADER / NAVBAR ===== */
+.navbar {
+    width: 100%;
+    background: #0f1115;
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    font-family: Arial, sans-serif;
 }
 
-.header {
-    background: #2E77D0;
+.navbar-content {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+}
+
+/* MENU LINKS */
+.nav-links {
+    display: flex;
+    gap: 40px;
+    flex: 1;
+    justify-content: center;
+}
+
+.nav-links a {
+    color: #cfcfcf;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: #00e676;
+}
+
+/* LOGIN – REGISTER BUTTONS */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.btn-btn-ghost {
     color: white;
-    padding: 20px 40px;
+    background: transparent;
+    border: 1px solid #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-btn-ghost:hover {
+    background: #ffffff22;
+}
+
+.btn-btn-primary {
+    background: #00c853;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    border: none;
+    transition: 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-btn-primary:hover {
+    background: #00e676;
+}
+
+/* ===== POPULAR COURSES SECTION ===== */
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+}
+
+.popular-courses {
+    padding: 80px 40px 40px;
+    background: #fff;
+}
+
+.section-header-flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 40px;
 }
 
-.menu {
-    list-style: none;
-    display: flex;
+.section-header-flex h2 {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+    color: #0f1115;
+}
+
+.section-header-flex p {
+    margin: 0;
+    color: #888;
+    font-size: 16px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.3s;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-outline {
+    color: #00c853;
+    border: 2px solid #00c853;
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: #00c85320;
+}
+
+/* COURSES GRID */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 30px;
 }
 
-.menu li a {
-    color: white;
-    text-decoration: none;
-}
-
-.course-grid {
-    padding: 40px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px 20px;
-}
-
-.course-card .img {
-    width: 100%;
-    height: 260px;
-    background: #3A3FA3;
+.course-card {
+    background: #fff;
     border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+    transition: 0.3s;
+    display: block;
 }
 
-.course-card .title {
-    text-align: center;
-    margin-top: 10px;
-    font-style: italic;
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
+.course-image {
+    position: relative;
+    overflow: hidden;
+    height: 180px;
+}
+
+.course-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.3s;
+}
+
+.course-card:hover .course-image img {
+    transform: scale(1.05);
+}
+
+.course-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #00c853;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.course-content {
+    padding: 20px;
+}
+
+.course-content h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    color: #0f1115;
+    line-height: 1.4;
+}
+
+.course-instructor {
+    margin: 0 0 15px 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.course-meta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.course-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.course-meta i {
+    color: #00c853;
+}
+
+.course-price {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.price-current {
+    font-size: 18px;
+    font-weight: 600;
+    color: #00c853;
+}
+
+.price-original {
+    font-size: 14px;
+    color: #999;
+    text-decoration: line-through;
+}
+
+/* ===== FOOTER ===== */
 .footer {
-    background: #2E77D0;
+    margin-top: auto;
+    background: #0f1115;
     padding: 40px;
     text-align: center;
-    color: white;
-    margin-top: 40px;
+    color: #cfcfcf;
+    border-top: 1px solid #333;
 }
+
+.footer-bottom p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .section-header-flex {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .courses-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .navbar {
+        padding: 10px 20px;
+    }
+
+    .nav-links {
+        gap: 20px;
+        font-size: 14px;
+    }
+
+    .nav-buttons {
+        gap: 5px;
+    }
+
+    .btn-btn-ghost,
+    .btn-btn-primary {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+/* ===== LOGIN PAGE ===== */
+/* Khung chứa form */
+.login-container {
+  max-width: 420px;
+  width: 100%;
+  margin: 120px auto; /* cách trên để tránh bị navbar cố định (nếu có) */
+  background: #ffffff;
+  padding: 28px 24px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-sizing: border-box;
+}
+
+/* Tiêu đề trang đăng nhập (h1) */
+.login-container + h1,
+h1 + .login-container,
+.login-container h1 {
+  margin: 0 0 16px 0;
+}
+
+/* Nếu bạn để <h1> bên ngoài form, canh giữa */
+body h1 {
+  text-align: center;
+  color: #0f1115;
+  font-size: 28px;
+  margin-top: 40px;
+}
+
+/* Labels */
+.login-container label {
+  display: block;
+  margin: 10px 0 6px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Inputs */
+.login-container input[type="email"],
+.login-container input[type="password"],
+.login-container input[type="text"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+  font-size: 14px;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus,
+.login-container input[type="text"]:focus {
+  border-color: #00c853;
+  box-shadow: 0 0 0 4px rgba(0,200,83,0.08);
+}
+
+/* Button submit */
+.login-container button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 14px;
+  background: #00c853;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background .18s, transform .08s;
+}
+
+.login-container button:hover {
+  background: #00e676;
+  transform: translateY(-1px);
+}
+
+/* Link đơn giản dưới form (nếu cần) */
+.login-container .form-footer {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Trường hợp body đang dùng flex column (như styles hiện tại),
+   nếu bạn muốn căn giữa theo chiều dọc thì dùng wrapper thay vì margin-top cố định.
+   Dưới đây là tùy chọn (bỏ comment nếu cần):
+*/
+
+.page-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;    /*  xếp các phần tử con theo chiều dọc*/
+  align-items: center;       /* căn giữa theo chiều ngang */
+  justify-content: center;   /* căn giữa theo chiều dọc */
+  gap: 24px;                 /* khoảng cách giữa tiêu đề và form */
+  min-height: calc(100vh - 80px); /* trừ navbar cố định (tùy chỉnh nếu cần) */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Đảm bảo tiêu đề không có margin trên gây lệch */
+.page-center h1,
+.page-center h1 + .login-container {
+  margin: 0;
+}
+
+/* Bỏ margin-top cố định ở .login-container để căn giữa chính xác */
+.login-container {
+  margin: 0;
+}
+
+/* ===== REGISTER FORM ADJUSTMENTS ===== */
+.register-container .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #444;
+}
+
+.register-container .checkbox a {
+  color: #00c853;
+  text-decoration: none;
+}
+
+.register-container .checkbox a:hover {
+  text-decoration: underline;
+}
+
+.register-container .form-footer {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+}
+
+.register-container .form-footer a {
+  color: #00c853;
+  text-decoration: none;
+}
+.register-container .form-footer a:hover {
+  text-decoration: underline;
+}
+
+/* ===== DASHBOARD LAYOUT ===== */
+.dashboard {
+  display: flex;
+  gap: 20px;
+  margin-top: 72px; /* tránh navbar cố định */
+  padding: 20px;
+}
+
+.sidebar {
+  width: 220px;
+  background: #0f1115;
+  color: #fff;
+  padding: 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  height: calc(100vh - 120px);
+  box-sizing: border-box;
+  position: sticky;
+  top: 80px;
+}
+
+.sidebar h3 { margin: 0 0 12px 0; }
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar li { margin: 8px 0; }
+.sidebar a { color: #cfcfcf; text-decoration: none; font-size: 14px; }
+.sidebar a:hover { color: #fff; }
+
+/* content area */
+.content { flex: 1; min-height: 400px; }
+
+/* panels */
+.panel { margin-bottom: 26px; background: #fff; padding: 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+
+/* cards */
+.cards { display:flex; gap:12px; flex-wrap:wrap; }
+.card { background:#fff; padding:12px 16px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); min-width:120px; }
+
+/* courses grid (used above) */
+.courses-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:16px; }
+.course-card { background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.06); display:flex; flex-direction:column; }
+.course-card img { width:100%; height:140px; object-fit:cover; }
+.course-info { padding:12px; display:flex; flex-direction:column; gap:8px; }
+.meta { color:#666; font-size:13px; }
+.course-actions { margin-top:auto; display:flex; gap:8px; }
+
+/* simple table */
+.table { width:100%; border-collapse:collapse; margin-top:12px; }
+.table th, .table td { padding:10px 12px; border-bottom:1px solid #eee; text-align:left; }
+.table thead th { background:#fafafa; }
+
+/* buttons small variants */
+.btn.small { padding:6px 8px; font-size:13px; }
+.btn-ghost { background:transparent; border:1px solid #ddd; color:#333; }
+.btn-outline { background:transparent; border:2px solid #00c853; color:#00c853; }
+.btn-primary { background:#00c853; color:#fff; border:none; padding:8px 12px; border-radius:6px; }
+.muted { color:#777; font-size:13px; }
+
+/* progress bar */
+.progress { background:#eee; height:10px; border-radius:6px; overflow:hidden; width:100%; }
+.progress-bar { background:#00c853; height:100%; width:0%; transition: width .4s; }
+
+/* responsive */
+@media (max-width: 900px) {
+  .dashboard { flex-direction:column; margin-top:60px; }
+  .sidebar { width:100%; height:auto; position:relative; top:0; }
+}
+
