@@ -70,6 +70,22 @@ switch ($request) {
         $controller = new CategoryController();
         $controller->manageCategories();
         break;
+    case '/admin/courses':
+        $controller = new CourseController();
+        $controller->manageCourses();
+        break;
+    case '/admin/courses/detail':
+        $controller = new CourseController();
+        $controller->courseDetail();
+        break;
+    case '/admin/courses/approve':
+        $controller = new CourseController();
+        $controller->approveCourse();
+        break;
+    case '/admin/courses/reject':
+        $controller = new CourseController();
+        $controller->rejectCourse();
+        break;
     case '/admin/categories/create':
         $controller = new CategoryController();
         $controller->createCategory();

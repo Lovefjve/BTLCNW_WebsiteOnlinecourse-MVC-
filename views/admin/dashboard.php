@@ -240,14 +240,14 @@
             </div>
             
             <!-- Duyệt phê duyệt khóa học -->
-            <div class="dashboard-card card-approvals">
+            <a href="<?php echo BASE_URL; ?>/admin/courses" class="dashboard-card card-approvals" style="text-decoration:none; color:inherit; display:block;">
                 <div class="card-icon">✅</div>
                 <div class="card-content">
                     <h3>Phê duyệt Khóa học</h3>
                     <p>Xem và duyệt các khóa học mới được tạo bởi giáo viên</p>
-                    <button class="card-link disabled">Sắp ra mắt 🔒</button>
+                    <span class="card-link">Mở →</span>
                 </div>
-            </div>
+            </a>
         </div>
         
         <div class="footer-section">
