@@ -15,6 +15,10 @@ $root_path = '../../';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Additional styles for better appearance */
+        * {
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -347,12 +351,13 @@ $root_path = '../../';
             <table class="courses-table">
                 <thead>
                     <tr>
-                        <th width="35%">Khóa học</th>
-                        <th width="15%">Trạng thái</th>
+                        <th width="32%">Khóa học</th>
+                        <th width="13%">Trạng thái</th>
                         <th width="10%">Học viên</th>
                         <th width="10%">Giá</th>
-                        <th width="15%">Ngày tạo</th>
-                        <th width="15%">Hành động</th>
+                        <th width="13%">Thời lượng</th>
+                        <th width="10%">Ngày tạo</th>
+                        <th width="12%">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -387,7 +392,7 @@ $root_path = '../../';
                                 $status_class = '';
                                 $status_text = '';
 
-                                // Chỉ xử lý published và pending, không xử lý draft nữa
+
                                 if ($course['status'] === 'published') {
                                     $status_class = 'status-published';
                                     $status_text = 'Đã xuất bản';
@@ -413,6 +418,11 @@ $root_path = '../../';
                                 <?php endif; ?>
                             </td>
                             <td>
+                                <span style="font-weight: 600; color: #2c3e50;">
+                                    <?php echo $course['duration_weeks']; ?> tuần
+                                </span>
+                            </td>
+                            <td>
                                 <span style="color: #7f8c8d; font-size: 14px;">
                                     <?php echo date('d/m/Y', strtotime($course['created_at'])); ?>
                                 </span>
@@ -426,10 +436,10 @@ $root_path = '../../';
 
                                     <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-view" title="Quản lý bài học">
-                                        <i class="fas fa-book-open"></i> 
+                                        <i class="fas fa-book-open"></i>
                                     </a>
 
-                                    <a href="?c=instructor&a=students&course_id=<?php echo $course['id']; ?>"
+                                    <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-students" title="Học viên">
                                         <i class="fas fa-users"></i>
                                     </a>

@@ -1,633 +1,790 @@
 <?php
 // views/instructor/materials/upload.php
+
+// Kiểm tra biến cần thiết
+if (!isset($course) || !isset($lesson) || !isset($materials)) {
+    die("Thiếu thông tin cần thiết để hiển thị trang");
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Tài liệu - <?php echo htmlspecialchars($lesson['title']); ?></title>
-    <link rel="stylesheet" href="../../../../assets/css/style.css">
+    <title>Quản lý Tài liệu - <?php echo htmlspecialchars($lesson['title'] ?? 'Bài học'); ?></title>
+    <link rel="stylesheet" href="../../../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Font và style đồng bộ */
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
         }
-        
+
         .header {
             background: white;
             padding: 25px;
-            border-radius: 15px;
+            border-radius: 10px;
             margin-bottom: 25px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            border-left: 6px solid #4a6cf7;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #4a6cf7;
         }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4a6cf7, #6a11cb);
-        }
-        
+
         .header-content {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            align-items: flex-start;
             gap: 20px;
         }
-        
+
         .lesson-info {
             flex: 1;
         }
-        
-        .back-link {
-            color: #4a6cf7;
-            text-decoration: none;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-        }
-        
-        .back-link:hover {
-            color: #6a11cb;
-            transform: translateX(-3px);
-        }
-        
+
         .lesson-info h1 {
             color: #2c3e50;
             font-size: 28px;
-            margin-bottom: 8px;
             display: flex;
             align-items: center;
             gap: 12px;
+            margin: 0 0 10px 0;
         }
-        
-        .lesson-info h2 {
+
+        .lesson-info h3 {
             color: #4a6cf7;
             font-size: 18px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin: 0 0 15px 0;
+            padding-left: 34px;
         }
-        
-        .course-info {
-            color: #7f8c8d;
-            font-size: 14px;
+
+        .course-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: #f8f9fa;
             padding: 8px 15px;
+            border-radius: 6px;
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4a6cf7 0%, #6a11cb 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
             border-radius: 8px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        
-        /* Upload Card */
-        .upload-card {
-            background: white;
-            border-radius: 15px;
-            padding: 35px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            margin-bottom: 25px;
-        }
-        
-        .upload-card h3 {
-            color: #2c3e50;
-            font-size: 22px;
-            margin-bottom: 25px;
-            display: flex;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
-            gap: 12px;
-        }
-        
-        .upload-card h3 i {
-            color: #4a6cf7;
-        }
-        
-        /* Form Styling */
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 10px;
-            color: #2c3e50;
+            gap: 8px;
             font-weight: 600;
             font-size: 15px;
-        }
-        
-        .required {
-            color: #ff4757;
-        }
-        
-        /* File Upload Area */
-        .upload-area {
-            border: 3px dashed #d1d8e0;
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
+            transition: all 0.3s ease;
             cursor: pointer;
-            transition: all 0.3s;
-            background: #f8f9fa;
-            position: relative;
-            overflow: hidden;
         }
-        
-        .upload-area:hover {
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 108, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-top: 4px solid;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.total {
             border-color: #4a6cf7;
-            background: #f0f4ff;
         }
-        
-        .upload-area.dragover {
-            border-color: #4a6cf7;
-            background: #e8eeff;
-            transform: scale(1.01);
+
+        .stat-card.size {
+            border-color: #28a745;
         }
-        
-        .upload-icon {
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 26px;
+            color: white;
+        }
+
+        .total .stat-icon {
+            background: #4a6cf7;
+        }
+
+        .size .stat-icon {
+            background: #28a745;
+        }
+
+        .stat-info h3 {
+            margin: 0;
+            font-size: 32px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .stat-info p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+        }
+
+        .empty-state i {
             font-size: 64px;
-            color: #4a6cf7;
+            color: #e0e0e0;
             margin-bottom: 20px;
         }
-        
-        .upload-text h4 {
-            color: #2c3e50;
+
+        .empty-state h4 {
+            color: #95a5a6;
             margin-bottom: 10px;
             font-size: 20px;
         }
-        
-        .upload-text p {
-            color: #7f8c8d;
-            margin-bottom: 20px;
+
+        .empty-state p {
+            color: #bdc3c7;
+            margin-bottom: 25px;
             font-size: 15px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        
-        .browse-btn {
-            display: inline-block;
-            background: #4a6cf7;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .browse-btn:hover {
-            background: #3a5ce5;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
-        }
-        
-        /* File List */
-        .file-list {
-            margin-top: 25px;
-            display: none;
-        }
-        
-        .file-list.show {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        .file-list-title {
-            color: #2c3e50;
-            font-size: 16px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .files-container {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #eef2f7;
-            border-radius: 10px;
-            padding: 15px;
-            background: #fafbfd;
-        }
-        
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
+
+        .materials-table {
+            width: 100%;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-collapse: collapse;
         }
-        
-        .file-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+        .materials-table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
         }
-        
+
+        .materials-table td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        .materials-table tr:hover {
+            background: #f8f9fa;
+        }
+
         .file-icon {
+            text-align: center;
+            width: 60px;
+        }
+
+        .file-icon-wrapper {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: white;
+            margin: 0 auto;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-name a {
+            color: #2c3e50;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .file-name a:hover {
+            color: #4a6cf7;
+            text-decoration: underline;
+        }
+
+        .file-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .file-info {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .file-info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .file-missing {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .download-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .upload-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
             width: 40px;
             height: 40px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-view {
+            background: #17a2b8;
             color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+        }
+
+        .btn-download {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .upload-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 18px;
         }
-        
-        .file-info {
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .file-name {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .file-size {
-            font-size: 13px;
-            color: #7f8c8d;
-        }
-        
-        .remove-file {
-            background: #ff4757;
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+
+        .upload-area {
+            border: 2px dashed #d1d8e0;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            border: none;
-            margin-left: 10px;
+            background: #f8f9fa;
         }
-        
-        .remove-file:hover {
-            background: #ff3742;
-            transform: scale(1.1);
+
+        .upload-area:hover {
+            border-color: #4a6cf7;
+            background: #f0f4ff;
         }
-        
-        /* Form Actions */
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #eef2f7;
+
+        .upload-icon {
+            font-size: 48px;
+            color: #4a6cf7;
+            margin-bottom: 15px;
         }
-        
-        .btn {
-            padding: 14px 30px;
-            border-radius: 8px;
+
+        .upload-text h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .upload-text p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .browse-btn {
+            display: inline-block;
+            background: #4a6cf7;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 15px;
+            transition: all 0.3s;
             border: none;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            font-size: 14px;
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #4a6cf7 0%, #6a11cb 100%);
-            color: white;
-            flex: 1;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(74, 108, 247, 0.3);
-        }
-        
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #495057;
-            border: 1px solid #dee2e6;
-        }
-        
-        .btn-secondary:hover {
-            background: #e9ecef;
+
+        .browse-btn:hover {
+            background: #3a5ce5;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 108, 247, 0.4);
         }
-        
-        /* Supported Files */
-        .supported-files {
-            background: #f0f7ff;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 30px;
+
+        .file-input {
+            display: none;
         }
-        
-        .supported-files h4 {
-            color: #2c3e50;
+
+        .file-info-display {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #495057;
+        }
+
+        .upload-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .table-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 15px;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
-        
-        .file-types {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+
+        .table-actions h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 18px;
         }
-        
-        .file-type-tag {
-            background: white;
-            padding: 8px 16px;
+
+        .material-count {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 13px;
-            color: #4a6cf7;
-            border: 1px solid #d1d8e0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        /* Alerts */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 4px solid;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            animation: slideIn 0.5s;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-        }
-        
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border-color: #ffeaa7;
-        }
-        
-        /* File Type Colors */
-        .pdf { border-color: #ff4757; }
-        .pdf .file-icon { background: #ff4757; }
-        
-        .document { border-color: #0d6efd; }
-        .document .file-icon { background: #0d6efd; }
-        
-        .presentation { border-color: #fd7e14; }
-        .presentation .file-icon { background: #fd7e14; }
-        
-        .spreadsheet { border-color: #198754; }
-        .spreadsheet .file-icon { background: #198754; }
-        
-        .archive { border-color: #6f42c1; }
-        .archive .file-icon { background: #6f42c1; }
-        
-        .image { border-color: #20c997; }
-        .image .file-icon { background: #20c997; }
-        
-        .text { border-color: #6c757d; }
-        .text .file-icon { background: #6c757d; }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .upload-card {
-                padding: 25px 20px;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .file-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .file-icon {
-                margin-right: 0;
-            }
-            
-            .remove-file {
-                align-self: flex-end;
-            }
+            font-size: 14px;
+            font-weight: 500;
         }
     </style>
 </head>
+
 <body>
+
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <div class="lesson-info">
-                    <a href="?c=material&a=index&lesson_id=<?php echo $lesson['id']; ?>" class="back-link">
-                        <i class="fas fa-arrow-left"></i> Quay lại danh sách tài liệu
-                    </a>
-                    
                     <h1>
-                        <i class="fas fa-cloud-upload-alt"></i> Upload Tài liệu Mới
+                        <i class="fas fa-paperclip"></i> Quản lý Tài liệu
                     </h1>
-                    
-                    <h2>
-                        <i class="fas fa-book-open"></i> <?php echo htmlspecialchars($lesson['title']); ?>
-                    </h2>
-                    
-                    <div class="course-info">
-                        <i class="fas fa-graduation-cap"></i> 
-                        Khóa học: <strong><?php echo htmlspecialchars($course['title']); ?></strong>
-                        • Bài học #<?php echo $lesson['order'] ?? 1; ?>
+                    <h3>
+                        <i class="fas fa-book-open"></i> <?php echo htmlspecialchars($lesson['title'] ?? 'Bài học'); ?>
+                    </h3>
+                    <div class="course-badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        Khóa học: <strong><?php echo htmlspecialchars($course['title'] ?? 'Khóa học'); ?></strong>
+                        - Bài học <?php echo htmlspecialchars($lesson['title'] ?? 'Bài học'); ?>
                     </div>
+                </div>
+                <div class="btn-group">
+                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
                 </div>
             </div>
         </div>
-        
-        <!-- Alerts -->
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i>
-                <?php echo htmlspecialchars($_SESSION['error']); ?>
-                <?php unset($_SESSION['error']); ?>
-            </div>
-        <?php endif; ?>
-        
+
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i>
-                <?php echo htmlspecialchars($_SESSION['success']); ?>
+                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($_SESSION['success']); ?>
                 <?php unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
-        
-        <!-- Upload Form -->
-        <div class="upload-card">
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_SESSION['error']); ?>
+                <?php unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Upload Section -->
+        <div class="upload-section">
             <h3>
-                <i class="fas fa-file-upload"></i> Chọn file để upload
+                <i class="fas fa-cloud-upload-alt"></i> Tải lên tài liệu mới
             </h3>
             
             <form action="?c=material&a=store" method="POST" enctype="multipart/form-data" id="uploadForm">
                 <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
                 
-                <!-- File Upload Area -->
-                <div class="form-group">
-                    <label class="form-label">
-                        Tài liệu <span class="required">*</span>
-                        <small>(Có thể chọn nhiều file)</small>
-                    </label>
-                    
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                        </div>
-                        <div class="upload-text">
-                            <h4>Kéo & Thả file vào đây</h4>
-                            <p>hoặc click để chọn file từ máy tính</p>
-                        </div>
-                        <input type="file" 
-                               name="materials[]" 
-                               id="fileInput" 
-                               multiple 
-                               style="display: none;"
-                               accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.jpg,.jpeg,.png,.gif">
-                        <button type="button" class="browse-btn" onclick="document.getElementById('fileInput').click()">
-                            <i class="fas fa-folder-open"></i> Chọn File
-                        </button>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
                     </div>
-                    
-                    <!-- Selected Files List -->
-                    <div class="file-list" id="fileList">
-                        <h4 class="file-list-title">
-                            <i class="fas fa-list"></i> File đã chọn
-                        </h4>
-                        <div class="files-container" id="filesContainer">
-                            <!-- Files will be added here dynamically -->
-                        </div>
+                    <div class="upload-text">
+                        <h4>Kéo & Thả file vào đây</h4>
+                        <p>hoặc click để chọn file từ máy tính</p>
                     </div>
+                    <input type="file" 
+                           name="materials[]" 
+                           id="fileInput" 
+                           class="file-input"
+                           multiple 
+                           accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.rar,.txt,.jpg,.jpeg,.png,.gif">
+                    <button type="button" class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Chọn File
+                    </button>
+                    
+                    <div class="file-info-display" id="fileInfoDisplay" style="display: none;"></div>
                 </div>
                 
-                <!-- Supported File Types -->
-                <div class="supported-files">
-                    <h4>
-                        <i class="fas fa-check-circle"></i> Định dạng file được hỗ trợ
-                    </h4>
-                    <div class="file-types">
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-pdf"></i> PDF
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-word"></i> DOC/DOCX
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-powerpoint"></i> PPT/PPTX
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-excel"></i> XLS/XLSX
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-archive"></i> ZIP/RAR
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-alt"></i> TXT
-                        </span>
-                        <span class="file-type-tag">
-                            <i class="fas fa-file-image"></i> JPG/PNG/GIF
-                        </span>
-                    </div>
-                    <p style="margin-top: 10px; font-size: 13px; color: #6c757d;">
-                        <i class="fas fa-info-circle"></i> 
-                        Kích thước tối đa: 50MB/file • Có thể upload nhiều file cùng lúc
-                    </p>
-                </div>
-                
-                <!-- Form Actions -->
-                <div class="form-actions">
-                    <a href="?c=material&a=index&lesson_id=<?php echo $lesson['id']; ?>" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Hủy bỏ
+                <div class="upload-actions">
+                    
+                    
+                    <!-- Link hủy dẫn về trang bài học -->
+                    
+                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy
                     </a>
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                   
+                    
+                    <button type="submit" class="btn btn-success" id="submitBtn">
                         <i class="fas fa-upload"></i> Upload Tài liệu
                     </button>
                 </div>
+                
+                <div style="margin-top: 15px; font-size: 13px; color: #6c757d;">
+                    <i class="fas fa-info-circle"></i> 
+                    Hỗ trợ: PDF, DOC, PPT, XLS, ZIP, JPG, PNG, TXT (tối đa 50MB/file)
+                </div>
             </form>
         </div>
+
+        <!-- Stats Section -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo $total_materials ?? 0; ?></h3>
+                    <p>Tổng tài liệu</p>
+                </div>
+            </div>
+            
+            <?php 
+            // Tính tổng dung lượng
+            $total_size = 0;
+            if (isset($materials) && is_array($materials)) {
+                foreach ($materials as $material) {
+                    if (isset($material['file_path']) && file_exists($material['file_path'])) {
+                        $total_size += filesize($material['file_path']);
+                    }
+                }
+            }
+            
+            // Hàm format size
+            function formatFileSize($bytes) {
+                if ($bytes === 0) return '0 Bytes';
+                $k = 1024;
+                $sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                $i = floor(log($bytes) / log($k));
+                return number_format($bytes / pow($k, $i), 2) . ' ' . $sizes[$i];
+            }
+            ?>
+            
+            <div class="stat-card size">
+                <div class="stat-icon">
+                    <i class="fas fa-hdd"></i>
+                </div>
+                <div class="stat-info">
+                    <h3><?php echo formatFileSize($total_size); ?></h3>
+                    <p>Tổng dung lượng</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Actions -->
+        <div class="table-actions">
+            <h3>
+                <i class="fas fa-list"></i> Danh sách tài liệu
+                <span class="material-count"><?php echo $total_materials ?? 0; ?> tài liệu</span>
+            </h3>
+        </div>
+
+        <!-- Materials List -->
+        <?php if (empty($materials)): ?>
+            <div class="empty-state">
+                <i class="fas fa-file-alt"></i>
+                <h4>Chưa có tài liệu nào</h4>
+                <p>Chưa có tài liệu nào được upload cho bài học này.</p>
+                <p>Hãy tải lên tài liệu đầu tiên để học viên có thể học tập.</p>
+            </div>
+        <?php else: ?>
+            <table class="materials-table">
+                <thead>
+                    <tr>
+                        <th width="8%"></th>
+                        <th width="52%">TÀI LIỆU</th>
+                        <th width="25%">NGÀY UPLOAD</th>
+                        <th width="15%">HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    require_once 'models/Material.php';
+                    $materialModel = new Material();
+                    
+                    foreach ($materials as $material): 
+                        $file_icon = $materialModel->getFileIcon($material['file_type'] ?? 'other');
+                        $file_color = $materialModel->getFileColor($material['file_type'] ?? 'other');
+                        
+                        $file_exists = isset($material['file_path']) && file_exists($material['file_path']);
+                        $file_size = $file_exists ? $materialModel->formatFileSize(filesize($material['file_path'])) : 'File bị mất';
+                        
+                        $upload_date = !empty($material['uploaded_at']) ? 
+                            date('d/m/Y H:i', strtotime($material['uploaded_at'])) : 
+                            'Chưa có';
+                    ?>
+                        <tr>
+                            <td class="file-icon">
+                                <div class="file-icon-wrapper" style="background: <?php echo $file_color; ?>;">
+                                    <i class="<?php echo $file_icon; ?>"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="file-name">
+                                    <a href="<?php echo $file_exists ? $material['file_path'] : '#'; ?>" 
+                                       target="_blank" 
+                                       <?php if(!$file_exists): ?>style="color: #6c757d; cursor: not-allowed;"<?php endif; ?>>
+                                        <?php echo htmlspecialchars($material['filename'] ?? 'Không có tên'); ?>
+                                    </a>
+                                    
+                                    <span class="file-type-badge" style="background: <?php echo $file_color; ?>20; color: <?php echo $file_color; ?>;">
+                                        <?php echo strtoupper($material['file_type'] ?? 'other'); ?>
+                                    </span>
+                                    
+                                    <?php if (!$file_exists): ?>
+                                        <span class="file-missing">
+                                            <i class="fas fa-exclamation-triangle"></i> File bị mất
+                                        </span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (isset($material['download_count']) && $material['download_count'] > 0): ?>
+                                        <span class="download-count">
+                                            <i class="fas fa-download"></i> <?php echo $material['download_count']; ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="file-info">
+                                    <div class="file-info-item">
+                                        <i class="fas fa-hdd"></i>
+                                        <span><?php echo $file_size; ?></span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="upload-date">
+                                    <?php echo $upload_date; ?>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <?php if ($file_exists): ?>
+                                        <!-- Nút Xem trước -->
+                                        <a href="<?php echo $material['file_path']; ?>" 
+                                           target="_blank" 
+                                           class="btn-action btn-view" 
+                                           title="Xem trước">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        
+                                        <!-- Nút Tải xuống -->
+                                        <a href="?c=material&a=download&id=<?php echo $material['id']; ?>" 
+                                           class="btn-action btn-download" 
+                                           title="Tải xuống">
+                                            <i class="fas fa-download"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <!-- Nút Xóa -->
+                                    <form action="?c=material&a=delete" 
+                                          method="POST" 
+                                          onsubmit="return confirm('Bạn có chắc muốn xóa tài liệu này?');"
+                                          style="display: inline;">
+                                        <input type="hidden" name="material_id" value="<?php echo $material['id']; ?>">
+                                        <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
+                                        <button type="submit" class="btn-action btn-delete" title="Xóa tài liệu">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
     </div>
 
-    <!-- JavaScript -->
     <script>
+        // File upload handling
         document.addEventListener('DOMContentLoaded', function() {
             const uploadArea = document.getElementById('uploadArea');
             const fileInput = document.getElementById('fileInput');
-            const fileList = document.getElementById('fileList');
-            const filesContainer = document.getElementById('filesContainer');
+            const fileInfoDisplay = document.getElementById('fileInfoDisplay');
             const submitBtn = document.getElementById('submitBtn');
-            let selectedFiles = [];
             
-            // Drag & Drop Events
+            // Drag & Drop
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 uploadArea.addEventListener(eventName, preventDefaults, false);
             });
@@ -646,11 +803,13 @@
             });
             
             function highlight() {
-                uploadArea.classList.add('dragover');
+                uploadArea.style.borderColor = '#4a6cf7';
+                uploadArea.style.background = '#f0f4ff';
             }
             
             function unhighlight() {
-                uploadArea.classList.remove('dragover');
+                uploadArea.style.borderColor = '#d1d8e0';
+                uploadArea.style.background = '#f8f9fa';
             }
             
             // Handle drop
@@ -667,185 +826,75 @@
                 handleFiles(this.files);
             });
             
-            // Browse button click
-            uploadArea.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
             // Handle selected files
             function handleFiles(files) {
-                selectedFiles = Array.from(files);
-                
-                if (selectedFiles.length > 0) {
-                    updateFileList();
-                    fileList.classList.add('show');
+                if (files.length > 0) {
+                    let html = '<strong>Đã chọn ' + files.length + ' file:</strong><br>';
+                    
+                    for (let i = 0; i < Math.min(files.length, 5); i++) {
+                        const file = files[i];
+                        const fileName = file.name;
+                        
+                        html += '<i class="fas fa-file"></i> ' + fileName + '<br>';
+                    }
+                    
+                    if (files.length > 5) {
+                        html += '... và ' + (files.length - 5) + ' file khác';
+                    }
+                    
+                    fileInfoDisplay.innerHTML = html;
+                    fileInfoDisplay.style.display = 'block';
+                    
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload ' + files.length + ' file';
                 } else {
-                    fileList.classList.remove('show');
-                }
-                
-                updateSubmitButton();
-            }
-            
-            // Update file list display
-            function updateFileList() {
-                filesContainer.innerHTML = '';
-                
-                selectedFiles.forEach((file, index) => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item ' + getFileTypeClass(file.name);
-                    
-                    const fileExtension = getFileExtension(file.name);
-                    const fileIcon = getFileIcon(fileExtension);
-                    
-                    fileItem.innerHTML = `
-                        <div class="file-icon">
-                            <i class="${fileIcon}"></i>
-                        </div>
-                        <div class="file-info">
-                            <div class="file-name" title="${file.name}">
-                                ${file.name}
-                            </div>
-                            <div class="file-size">
-                                ${formatFileSize(file.size)}
-                            </div>
-                        </div>
-                        <button type="button" class="remove-file" onclick="removeFile(${index})">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    
-                    filesContainer.appendChild(fileItem);
-                });
-            }
-            
-            // Remove file from list
-            window.removeFile = function(index) {
-                selectedFiles.splice(index, 1);
-                
-                // Update data transfer
-                const dataTransfer = new DataTransfer();
-                selectedFiles.forEach(file => {
-                    dataTransfer.items.add(file);
-                });
-                fileInput.files = dataTransfer.files;
-                
-                updateFileList();
-                if (selectedFiles.length === 0) {
-                    fileList.classList.remove('show');
-                }
-                updateSubmitButton();
-            };
-            
-            // Update submit button state
-            function updateSubmitButton() {
-                if (selectedFiles.length > 0) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `<i class="fas fa-upload"></i> Upload ${selectedFiles.length} file`;
-                } else {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = `<i class="fas fa-upload"></i> Upload Tài liệu`;
+                    fileInfoDisplay.style.display = 'none';
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Tài liệu';
                 }
             }
             
-            // Get file extension
-            function getFileExtension(filename) {
-                return filename.split('.').pop().toLowerCase();
-            }
-            
-            // Get file type class
-            function getFileTypeClass(filename) {
-                const ext = getFileExtension(filename);
-                const typeMap = {
-                    'pdf': 'pdf',
-                    'doc': 'document',
-                    'docx': 'document',
-                    'ppt': 'presentation',
-                    'pptx': 'presentation',
-                    'xls': 'spreadsheet',
-                    'xlsx': 'spreadsheet',
-                    'zip': 'archive',
-                    'rar': 'archive',
-                    'txt': 'text',
-                    'jpg': 'image',
-                    'jpeg': 'image',
-                    'png': 'image',
-                    'gif': 'image'
-                };
-                return typeMap[ext] || 'other';
-            }
-            
-            // Get file icon based on extension
-            function getFileIcon(extension) {
-                const iconMap = {
-                    'pdf': 'fas fa-file-pdf',
-                    'doc': 'fas fa-file-word',
-                    'docx': 'fas fa-file-word',
-                    'ppt': 'fas fa-file-powerpoint',
-                    'pptx': 'fas fa-file-powerpoint',
-                    'xls': 'fas fa-file-excel',
-                    'xlsx': 'fas fa-file-excel',
-                    'zip': 'fas fa-file-archive',
-                    'rar': 'fas fa-file-archive',
-                    'txt': 'fas fa-file-alt',
-                    'jpg': 'fas fa-file-image',
-                    'jpeg': 'fas fa-file-image',
-                    'png': 'fas fa-file-image',
-                    'gif': 'fas fa-file-image'
-                };
-                return iconMap[extension] || 'fas fa-file';
-            }
-            
-            // Format file size
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-            
-            // Form submission
+            // Form validation
             document.getElementById('uploadForm').addEventListener('submit', function(e) {
-                // Show loading state
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang upload...';
-                submitBtn.disabled = true;
+                const files = fileInput.files;
                 
-                // Validate file size
+                if (files.length === 0) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn ít nhất một file để upload!');
+                    return;
+                }
+                
+                // Validate file size and type
                 const maxSize = 50 * 1024 * 1024; // 50MB
-                for (let file of selectedFiles) {
+                const allowedTypes = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', 'rar', 'txt', 'jpg', 'jpeg', 'png', 'gif'];
+                
+                for (let file of files) {
+                    const fileExt = file.name.split('.').pop().toLowerCase();
+                    
                     if (file.size > maxSize) {
                         e.preventDefault();
-                        alert(`File "${file.name}" vượt quá kích thước 50MB cho phép`);
-                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Tài liệu';
-                        submitBtn.disabled = false;
+                        alert('File "' + file.name + '" vượt quá kích thước 50MB cho phép!');
+                        return;
+                    }
+                    
+                    if (!allowedTypes.includes(fileExt)) {
+                        e.preventDefault();
+                        alert('File "' + file.name + '" có định dạng không được hỗ trợ!');
                         return;
                     }
                 }
                 
-                // Validate file types
-                const allowedExtensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'zip', 'rar', 'txt', 'jpg', 'jpeg', 'png', 'gif'];
-                for (let file of selectedFiles) {
-                    const ext = getFileExtension(file.name);
-                    if (!allowedExtensions.includes(ext)) {
-                        e.preventDefault();
-                        alert(`File "${file.name}" có định dạng không được hỗ trợ`);
-                        submitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Tài liệu';
-                        submitBtn.disabled = false;
-                        return;
-                    }
-                }
+                // Show loading
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang upload...';
+                submitBtn.disabled = true;
             });
-            
-            // Auto-hide alerts after 5 seconds
-            setTimeout(() => {
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(alert => {
-                    alert.style.transition = 'opacity 0.5s';
-                    alert.style.opacity = '0';
-                    setTimeout(() => alert.remove(), 500);
-                });
-            }, 5000);
         });
+        
+        // Auto hide alerts
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
     </script>
 </body>
 </html>

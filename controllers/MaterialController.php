@@ -3,6 +3,20 @@
 
 class MaterialController {
     
+    public function __construct() {
+        // Kiểm tra đăng nhập
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ?c=auth&a=login');
+            exit;
+        }
+        
+        // Kiểm tra quyền instructor
+        if (($_SESSION['role'] ?? 0) != 1) {
+            header('Location: ?c=auth&a=login');
+            exit;
+        }
+    }
+    
     public function index() {
         // Kiểm tra quyền
         if (($_SESSION['role'] ?? 0) != 1) {
@@ -91,95 +105,6 @@ class MaterialController {
         require_once $view_file;
     }
     
-    public function upload() {
-        // Kiểm tra quyền
-        if (($_SESSION['role'] ?? 0) != 1) {
-            $_SESSION['error'] = "Bạn không có quyền truy cập";
-            header('Location: ?c=instructor&a=courses');
-            exit;
-        }
-        
-        // Lấy lesson_id từ URL
-        $lesson_id = $_GET['lesson_id'] ?? 0;
-        
-        if (!$lesson_id) {
-            $_SESSION['error'] = "Không tìm thấy bài học";
-            header('Location: ?c=instructor&a=courses');
-            exit;
-        }
-        
-        // Load models
-        require_once 'models/Course.php';
-        require_once 'models/Lesson.php';
-        require_once 'models/Material.php';
-        
-        $courseModel = new Course();
-        $lessonModel = new Lesson();
-        $materialModel = new Material();
-        
-        // KHỞI TẠO BIẾN
-        $errors = [];
-        $old_input = [];
-        
-        try {
-            // Lấy thông tin bài học
-            $lesson = $lessonModel->getById($lesson_id);
-            
-            if (!$lesson) {
-                $_SESSION['error'] = "Bài học không tồn tại";
-                header('Location: ?c=instructor&a=courses');
-                exit;
-            }
-            
-            // Lấy thông tin khóa học
-            $course = $courseModel->getById($lesson['course_id']);
-            
-            if (!$course) {
-                $_SESSION['error'] = "Khóa học không tồn tại";
-                header('Location: ?c=instructor&a=courses');
-                exit;
-            }
-            
-            // Kiểm tra quyền sở hữu
-            if ($course['instructor_id'] != $_SESSION['user_id']) {
-                $_SESSION['error'] = "Bạn không có quyền upload tài liệu cho bài học này";
-                header('Location: ?c=instructor&a=courses');
-                exit;
-            }
-            
-            // Lấy errors và old input từ session
-            $errors = $_SESSION['errors'] ?? [];
-            $old_input = $_SESSION['old_input'] ?? [];
-            
-            // Xóa session data sau khi dùng
-            unset($_SESSION['errors']);
-            unset($_SESSION['old_input']);
-            
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
-            header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
-            exit;
-        }
-        
-        // Hiển thị view
-        $data = [
-            'course' => $course,
-            'lesson' => $lesson,
-            'errors' => $errors,
-            'old_input' => $old_input
-        ];
-        
-        extract($data);
-        
-        // Kiểm tra file view tồn tại
-        $view_file = 'views/instructor/materials/upload.php';
-        if (!file_exists($view_file)) {
-            die("View file không tồn tại: $view_file");
-        }
-        
-        require_once $view_file;
-    }
-    
     public function store() {
         // Kiểm tra quyền
         if (($_SESSION['role'] ?? 0) != 1) {
@@ -208,7 +133,7 @@ class MaterialController {
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['old_input'] = $_POST;
-            header('Location: ?c=material&a=upload&lesson_id=' . $lesson_id);
+            header('Location: ?c=material&a=index&lesson_id=' . $lesson_id); // SỬA: về index thay vì upload
             exit;
         }
         
@@ -254,10 +179,14 @@ class MaterialController {
                             'type' => $_FILES['materials']['type'][$i]
                         ];
                         
-                        if ($materialModel->upload($lesson_id, $file_data)) {
-                            $uploaded_count++;
-                        } else {
-                            $upload_errors[] = "Không thể upload file: " . $file_data['name'];
+                        try {
+                            if ($materialModel->upload($lesson_id, $file_data)) {
+                                $uploaded_count++;
+                            } else {
+                                $upload_errors[] = "Không thể upload file: " . $file_data['name'];
+                            }
+                        } catch (Exception $e) {
+                            $upload_errors[] = "Lỗi upload file " . $file_data['name'] . ": " . $e->getMessage();
                         }
                     } elseif ($_FILES['materials']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
                         $upload_errors[] = "Lỗi upload file: " . $_FILES['materials']['name'][$i];
@@ -265,7 +194,7 @@ class MaterialController {
                 }
             } else {
                 $_SESSION['error'] = "Vui lòng chọn ít nhất một file để upload";
-                header('Location: ?c=material&a=upload&lesson_id=' . $lesson_id);
+                header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
                 exit;
             }
             
@@ -282,21 +211,6 @@ class MaterialController {
         }
         
         header('Location: ?c=material&a=index&lesson_id=' . $lesson_id);
-        exit;
-    }
-    
-    public function edit() {
-        // Nếu bạn muốn có chức năng chỉnh sửa thông tin tài liệu (đổi tên, mô tả, v.v.)
-        // Thêm method này tương tự như lesson edit
-        $_SESSION['error'] = "Chức năng đang được phát triển";
-        header('Location: ?c=material&a=index&lesson_id=' . ($_GET['lesson_id'] ?? 0));
-        exit;
-    }
-    
-    public function update() {
-        // Nếu bạn muốn có chức năng cập nhật thông tin tài liệu
-        $_SESSION['error'] = "Chức năng đang được phát triển";
-        header('Location: ?c=material&a=index&lesson_id=' . ($_POST['lesson_id'] ?? 0));
         exit;
     }
     

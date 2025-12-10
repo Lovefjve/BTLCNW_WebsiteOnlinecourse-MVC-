@@ -434,7 +434,7 @@
                     </h3>
                 </div>
                 <div class="btn-group">
-                    <a href="?c=instructor&a=my_courses" class="btn btn-secondary">
+                    <a href="?c=instructor&a=courses" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                     <a href="?c=lesson&a=create&course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">
@@ -507,8 +507,8 @@
                     <tr>
                         <th width="8%">STT</th>
                         <th width="52%">BÀI HỌC</th>
-                        <th width="20%">NGÀY TẠO</th>
-                        <th width="20%">THAO TÁC</th>
+                        <th width="23%">NGÀY TẠO</th>
+                        <th width="17%">HÀNH ĐỘNG</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -574,12 +574,6 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     
-                                    <!-- Nút Quản lý tài liệu -->
-                                    <a href="?c=material&a=index&lesson_id=<?php echo $lesson['id']; ?>"
-                                        class="btn-action btn-materials" 
-                                        title="Quản lý tài liệu">
-                                        <i class="fas fa-paperclip"></i>
-                                    </a>
                                     
                                     <!-- Nút Đăng tài liệu (dẫn đến trang upload) -->
                                     <a href="?c=material&a=create&lesson_id=<?php echo $lesson['id']; ?>"
