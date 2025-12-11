@@ -15,6 +15,9 @@ $root_path = '../../';
     <link rel="stylesheet" href="<?php echo $root_path; ?>assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
         .create-form {
             max-width: 800px;
             margin: 0 auto;
@@ -160,7 +163,7 @@ $root_path = '../../';
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới</h1>
-            <a href="?c=instructor&a=courses" class="btn">
+            <a href="?c=course&a=index" class="btn">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
@@ -257,7 +260,7 @@ $root_path = '../../';
                     <button type="submit" class="btn">
                         <i class="fas fa-save"></i> Lưu khóa học
                     </button>
-                    <a href="?c=instructor&a=courses" class="btn-cancel">
+                    <a href="?c=course&a=index" class="btn-cancel">
                         Hủy
                     </a>
                 </div>

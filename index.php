@@ -1,92 +1,96 @@
 <?php
 // index.php
 
-// Bật lỗi để debug
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Bật session (CHỈ Ở ĐÂY)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Xử lý routing
-$controller = $_GET['c'] ?? 'instructor';
-$action = $_GET['a'] ?? 'courses';
+$controller = $_GET['c'] ?? 'course';
+$action = $_GET['a'] ?? 'index';
 
-// Routing cho InstructorController
+// ========== InstructorController (DASHBOARD) ==========
 if ($controller === 'instructor') {
-    // Include controller
     require_once 'controllers/InstructorController.php';
-
-    // Tạo instance
     $instructorController = new InstructorController();
 
-    // Map actions
     $actionMap = [
-        'courses' => 'courses',
-        'createCourse' => 'createCourse',
-        'storeCourse' => 'storeCourse',
-        'edit' => 'editCourse',
-        'update' => 'updateCourse',
-        'delete' => 'deleteCourse'
+        'dashboard' => 'dashboard',   // Trang chủ instructor
+        'profile' => 'profile',       // Hồ sơ giảng viên
+        'settings' => 'settings'      // Cài đặt
     ];
 
-    // Gọi phương thức
-    $method = $actionMap[$action] ?? 'courses';
-
+    $method = $actionMap[$action] ?? 'dashboard';
+    
     if (method_exists($instructorController, $method)) {
         $instructorController->$method();
     } else {
         echo "Lỗi: Phương thức '$method' không tồn tại trong InstructorController";
     }
 }
-// Routing cho LessonController
-elseif ($controller === 'lesson') {
-    // Include controller
-    require_once 'controllers/LessonController.php';
 
-    // Tạo instance
-    $lessonController = new LessonController();
+// ========== CourseController (MỚI) ==========
+elseif ($controller === 'course') {
+    require_once 'controllers/CourseController.php';
+    $courseController = new CourseController();
 
-    // Map actions
     $actionMap = [
-        'index' => 'index',      // Danh sách bài học
-        'create' => 'create',    // Form tạo bài học
-        'store' => 'store',      // Xử lý tạo bài học
-        'edit' => 'edit',        // Form sửa bài học
-        'update' => 'update',    // Xử lý cập nhật
-        'delete' => 'delete'     // Xử lý xóa
+        'index' => 'index',         // Danh sách khóa học
+        'create' => 'create',       // Form tạo khóa học
+        'store' => 'store',         // Lưu khóa học mới
+        'edit' => 'edit',           // Form sửa khóa học
+        'update' => 'update',       // Cập nhật khóa học
+        'delete' => 'delete'        // Xóa khóa học (GIỮ NGUYÊN)
     ];
 
-    // Gọi phương thức
     $method = $actionMap[$action] ?? 'index';
+    
+    if (method_exists($courseController, $method)) {
+        $courseController->$method();
+    } else {
+        echo "Lỗi: Phương thức '$method' không tồn tại trong CourseController";
+    }
+}
 
+// ========== LessonController ==========
+elseif ($controller === 'lesson') {
+    require_once 'controllers/LessonController.php';
+    $lessonController = new LessonController();
+
+    $actionMap = [
+        'index' => 'index',
+        'create' => 'create',
+        'store' => 'store',
+        'edit' => 'edit',
+        'update' => 'update',
+        'delete' => 'delete'
+    ];
+
+    $method = $actionMap[$action] ?? 'index';
+    
     if (method_exists($lessonController, $method)) {
         $lessonController->$method();
     } else {
         echo "Lỗi: Phương thức '$method' không tồn tại trong LessonController";
     }
 }
-// Routing cho MaterialController
-elseif ($controller === 'material') {
-    // Include controller
-    require_once 'controllers/MaterialController.php';
 
-    // Tạo instance
+// ========== MaterialController ==========
+elseif ($controller === 'material') {
+    require_once 'controllers/MaterialController.php';
     $materialController = new MaterialController();
 
-    // Map actions cho MaterialController
     $actionMap = [
-        'index' => 'index',        // Danh sách tài liệu + form upload
-        'store' => 'store',        // Xử lý upload tài liệu
-        'delete' => 'delete',      // Xử lý xóa tài liệu
-        'download' => 'download',  // Download tài liệu
+        'index' => 'index',
+        'store' => 'store',
+        'delete' => 'delete',
+        'download' => 'download'
     ];
 
-    // Gọi phương thức
     $method = $actionMap[$action] ?? 'index';
-
+    
     if (method_exists($materialController, $method)) {
         $materialController->$method();
     } else {
@@ -94,22 +98,16 @@ elseif ($controller === 'material') {
     }
 }
 
-// Routing cho StudentController
+// ========== StudentController ==========
 elseif ($controller === 'student') {
-    // Include controller
     require_once 'controllers/StudentController.php';
-    
-    // Tạo instance
     $studentController = new StudentController();
-    
-    // Map actions
+
     $actionMap = [
-        'index' => 'index',            // Danh sách học viên
-        'progress' => 'progress',      // Xem tiến độ chi tiết
-        'export' => 'export'           // Xuất Excel
+        'index' => 'index',
+        'export' => 'export'
     ];
-    
-    // Gọi phương thức
+
     $method = $actionMap[$action] ?? 'index';
     
     if (method_exists($studentController, $method)) {
@@ -118,13 +116,12 @@ elseif ($controller === 'student') {
         echo "Lỗi: Phương thức '$method' không tồn tại trong StudentController";
     }
 }
-// Thêm các controller khác ở đây
-// elseif ($controller === 'home') { ... }
-// elseif ($controller === 'auth') { ... }
-else {
-    echo "Lỗi: Controller '$controller' không tồn tại";
 
-    // Hoặc redirect về trang mặc định
-    // header('Location: ?c=instructor&a=courses');
-    // exit;
+// ========== AuthController (nếu có) ==========
+
+
+// ========== DEFAULT/ERROR ==========
+else {
+    header('Location: ?c=instructor&a=dashboard');
+    exit;
 }

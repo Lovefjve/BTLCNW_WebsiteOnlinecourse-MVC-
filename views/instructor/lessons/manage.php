@@ -434,7 +434,7 @@
                     </h3>
                 </div>
                 <div class="btn-group">
-                    <a href="?c=instructor&a=courses" class="btn btn-secondary">
+                    <a href="?c=course&a=index" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                     <a href="?c=lesson&a=create&course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">

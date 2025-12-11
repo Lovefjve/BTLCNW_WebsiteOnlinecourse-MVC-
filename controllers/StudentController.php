@@ -1,279 +1,329 @@
 <?php
 // controllers/StudentController.php
 
-class StudentController {
-    
-    public function __construct() {
+class StudentController
+{
+    public function __construct()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? 0) != 1) {
             header('Location: ?c=auth&a=login');
             exit;
         }
     }
-    
-    // Danh sách học viên
-    public function index() {
+
+    // ========== THÊM PHƯƠNG THỨC RENDER VÀO ĐÂY ==========
+    private function render($viewPath, $data = [])
+    {
+        extract($data);
+        $fullPath = "views/{$viewPath}.php";
+
+        if (!file_exists($fullPath)) {
+            die("Lỗi: Không tìm thấy view '{$viewPath}'");
+        }
+
+        require_once $fullPath;
+    }
+    // ========== KẾT THÚC PHƯƠNG THỨC RENDER ==========
+
+    public function index()
+    {
         $course_id = $_GET['course_id'] ?? 0;
-        
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 10;
+        $offset = ($page - 1) * $limit;
+
         if (!$course_id) {
             $_SESSION['error'] = "Không tìm thấy khóa học";
             header('Location: ?c=instructor&a=courses');
             exit;
         }
-        
+
+        // Load models
         require_once 'models/Course.php';
         require_once 'models/Enrollment.php';
         require_once 'models/Lesson.php';
-        
+
         $courseModel = new Course();
         $enrollmentModel = new Enrollment();
         $lessonModel = new Lesson();
-        
+
         try {
+            // Lấy thông tin khóa học
             $course = $courseModel->getById($course_id);
-            
+
             if (!$course) {
                 $_SESSION['error'] = "Khóa học không tồn tại";
                 header('Location: ?c=instructor&a=courses');
                 exit;
             }
-            
+
+            // Kiểm tra quyền sở hữu
             if ($course['instructor_id'] != $_SESSION['user_id']) {
                 $_SESSION['error'] = "Bạn không có quyền xem học viên của khóa học này";
                 header('Location: ?c=instructor&a=courses');
                 exit;
             }
-            
+
+            // Lấy tổng số học viên
+            $total_students = $enrollmentModel->countStudentsByCourse($course_id);
+            $total_pages = ceil($total_students / $limit);
+
             // Lấy danh sách học viên
-            $students = $enrollmentModel->getStudentsByCourse($course_id);
-            
-            // Lấy danh sách bài học
-            $lessons = $lessonModel->getByCourse($course_id);
-            $total_lessons = count($lessons);
-            
+            $students = $enrollmentModel->getStudentsByCourse($course_id, $offset, $limit);
+
+            // Lấy tổng số bài học
+            $total_lessons = $lessonModel->countByCourse($course_id);
+
             // Thống kê
-            $total_students = count($students);
             $active_students = 0;
             $completed_students = 0;
-            
+            $inactive_students = 0;
+            $dropped_students = 0;
+
+            // Xử lý dữ liệu học viên
             foreach ($students as &$student) {
-                // Đảm bảo có các trường cần thiết
-                $student['progress'] = $student['progress'] ?? 0;
-                $student['completed_lessons'] = $student['completed_lessons'] ?? 0;
-                
+                // Format dữ liệu
+                $student['progress'] = (int) ($student['progress'] ?? 0);
+                $student['status'] = $student['status'] ?? 'active';
+                $student['enrolled_date'] = $student['enrolled_date'] ?? null;
+
+                // Tính toán số bài học đã hoàn thành
+                if ($total_lessons > 0) {
+                    $student['completed_lessons'] = round(($student['progress'] / 100) * $total_lessons);
+                } else {
+                    $student['completed_lessons'] = 0;
+                }
+
+                // Format ngày đăng ký
+                if (!empty($student['enrolled_date'])) {
+                    $student['enrolled_date_formatted'] = date('d/m/Y', strtotime($student['enrolled_date']));
+                } else {
+                    $student['enrolled_date_formatted'] = 'N/A';
+                }
+
+                // Format tên hiển thị
+                $student['display_name'] = !empty($student['fullname']) ? $student['fullname'] : (!empty($student['username']) ? $student['username'] : 'Không có tên');
+                $student['display_email'] = $student['email'] ?? 'Không có email';
+
+                // Map status text
+                $status_map = [
+                    'active' => 'Đang học',
+                    'completed' => 'Đã hoàn thành',
+                    'dropped' => 'Đã hủy'
+                ];
+                $student['enrollment_status_text'] = $status_map[$student['status']] ?? 'Đang học';
+
+                // Xác định trạng thái học tập
                 if ($student['progress'] >= 100) {
                     $completed_students++;
+                    $student['learning_status'] = 'completed';
+                    $student['learning_status_text'] = 'Đã hoàn thành';
                 } elseif ($student['progress'] > 0) {
                     $active_students++;
+                    $student['learning_status'] = 'active';
+                    $student['learning_status_text'] = 'Đang học';
+                } else {
+                    $inactive_students++;
+                    $student['learning_status'] = 'inactive';
+                    $student['learning_status_text'] = 'Chưa bắt đầu';
+                }
+
+                // Đếm dropped students
+                if ($student['status'] === 'dropped') {
+                    $dropped_students++;
                 }
             }
-            
+            unset($student); // Hủy tham chiếu
+
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi: " . $e->getMessage();
             header('Location: ?c=instructor&a=courses');
             exit;
         }
-        
-        // Hiển thị view
-        $data = [
+
+        // ========== SỬA DÒNG NÀY ==========
+        //view rendering
+        $this->render('instructor/students/list', [
             'course' => $course,
             'students' => $students,
-            'lessons' => $lessons,
             'total_lessons' => $total_lessons,
             'total_students' => $total_students,
             'active_students' => $active_students,
-            'completed_students' => $completed_students
-        ];
-        
-        extract($data);
-        
-        $view_file = 'views/instructor/students/list.php';
-        if (!file_exists($view_file)) {
-            die("Không tìm thấy file view: $view_file");
-        }
-        
-        require_once $view_file;
+            'completed_students' => $completed_students,
+            'inactive_students' => $inactive_students,
+            'dropped_students' => $dropped_students,
+            'current_page' => $page,
+            'total_pages' => $total_pages,
+            'limit' => $limit
+        ]);
+        // ========== KẾT THÚC SỬA ==========
     }
-    
-    // Xem tiến độ chi tiết của học viên
-    public function progress() {
-        $course_id = $_GET['course_id'] ?? 0;
-        $student_id = $_GET['student_id'] ?? 0;
-        
-        if (!$course_id || !$student_id) {
-            $_SESSION['error'] = "Thiếu thông tin yêu cầu";
-            header('Location: ?c=instructor&a=courses');
-            exit;
-        }
-        
-        require_once 'models/Course.php';
-        require_once 'models/User.php';
-        require_once 'models/Lesson.php';
-        require_once 'models/Enrollment.php';
-        
-        $courseModel = new Course();
-        $userModel = new User();
-        $lessonModel = new Lesson();
-        $enrollmentModel = new Enrollment();
-        
-        try {
-            // Lấy thông tin khóa học
-            $course = $courseModel->getById($course_id);
-            
-            if (!$course) {
-                $_SESSION['error'] = "Khóa học không tồn tại";
-                header('Location: ?c=instructor&a=courses');
-                exit;
-            }
-            
-            // Kiểm tra quyền sở hữu
-            if ($course['instructor_id'] != $_SESSION['user_id']) {
-                $_SESSION['error'] = "Bạn không có quyền xem tiến độ học viên này";
-                header('Location: ?c=instructor&a=courses');
-                exit;
-            }
-            
-            // Lấy thông tin học viên
-            $student = $userModel->getById($student_id);
-            
-            if (!$student || $student['role'] != 0) {
-                $_SESSION['error'] = "Học viên không tồn tại";
-                header('Location: ?c=student&a=index&course_id=' . $course_id);
-                exit;
-            }
-            
-            // Kiểm tra học viên có đăng ký khóa học không
-            if (!$enrollmentModel->isStudentEnrolled($student_id, $course_id)) {
-                $_SESSION['error'] = "Học viên chưa đăng ký khóa học này";
-                header('Location: ?c=student&a=index&course_id=' . $course_id);
-                exit;
-            }
-            
-            // Lấy tiến độ học tập
-            $student_progress = $enrollmentModel->getStudentProgress($student_id, $course_id);
-            
-            // Lấy danh sách bài học với trạng thái hoàn thành
-            $lessons = $lessonModel->getByCourse($course_id);
-            foreach ($lessons as &$lesson) {
-                $lesson['completed'] = $enrollmentModel->isLessonCompleted($student_id, $lesson['id']);
-            }
-            
-            // Tính toán thêm thông tin
-            $total_lessons = count($lessons);
-            $completed_lessons = $student_progress['completed_lessons'] ?? 0;
-            $progress_percentage = $student_progress['progress'] ?? 0;
-            
-        } catch (Exception $e) {
-            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
-            header('Location: ?c=student&a=index&course_id=' . $course_id);
-            exit;
-        }
-        
-        // Hiển thị view
-        $data = [
-            'course' => $course,
-            'student' => $student,
-            'student_progress' => $student_progress,
-            'lessons' => $lessons,
-            'total_lessons' => $total_lessons,
-            'completed_lessons' => $completed_lessons,
-            'progress_percentage' => $progress_percentage
-        ];
-        
-        extract($data);
-        
-        $view_file = 'views/instructor/students/progress.php';
-        if (!file_exists($view_file)) {
-            die("Không tìm thấy file view: $view_file");
-        }
-        
-        require_once $view_file;
-    }
-    
+
     // Xuất danh sách học viên
-    public function export() {
+    public function export()
+    {
         $course_id = $_GET['course_id'] ?? 0;
-        
+
         if (!$course_id) {
             $_SESSION['error'] = "Không tìm thấy khóa học";
             header('Location: ?c=instructor&a=courses');
             exit;
         }
-        
+
+        // Load models
         require_once 'models/Course.php';
         require_once 'models/Enrollment.php';
         require_once 'models/Lesson.php';
-        
+
         $courseModel = new Course();
         $enrollmentModel = new Enrollment();
         $lessonModel = new Lesson();
-        
+
         try {
+            // Lấy thông tin khóa học
             $course = $courseModel->getById($course_id);
+
             if (!$course || $course['instructor_id'] != $_SESSION['user_id']) {
                 $_SESSION['error'] = "Bạn không có quyền xuất dữ liệu";
                 header('Location: ?c=instructor&a=courses');
                 exit;
             }
-            
-            $students = $enrollmentModel->getStudentsByCourse($course_id);
-            $lessons = $lessonModel->getByCourse($course_id);
-            $total_lessons = count($lessons);
-            
+
+            // Lấy tất cả học viên (không phân trang)
+            $students = $enrollmentModel->getAllStudentsByCourse($course_id);
+            $total_lessons = $lessonModel->countByCourse($course_id);
+
+            // Tạo file Excel
             header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment;filename="hoc_vien_khoa_' . $course_id . '_' . date('Y-m-d') . '.xls"');
+            header('Content-Disposition: attachment;filename="danh_sach_hoc_vien_' . $course_id . '_' . date('Y-m-d_H-i') . '.xls"');
             header('Cache-Control: max-age=0');
-            
-            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
-            echo '<h3>Danh sách học viên - ' . htmlspecialchars($course['title']) . '</h3>';
-            echo '<table border="1" style="width:100%;">';
-            echo '<tr style="background:#4a6cf7;color:white;font-weight:bold;">';
+
+            // HTML cho Excel
+            echo '<!DOCTYPE html>';
+            echo '<html>';
+            echo '<head>';
+            echo '<meta charset="UTF-8">';
+            echo '<title>Danh sách học viên - ' . htmlspecialchars($course['title']) . '</title>';
+            echo '<style>';
+            echo 'table { border-collapse: collapse; width: 100%; }';
+            echo 'th { background-color: #4a6cf7; color: white; padding: 10px; text-align: center; font-weight: bold; }';
+            echo 'td { border: 1px solid #ddd; padding: 8px; }';
+            echo 'tr:nth-child(even) { background-color: #f9f9f9; }';
+            echo '.center { text-align: center; }';
+            echo '</style>';
+            echo '</head>';
+            echo '<body>';
+
+            // Tiêu đề
+            echo '<h2>DANH SÁCH HỌC VIÊN</h2>';
+            echo '<h3>Khóa học: ' . htmlspecialchars($course['title']) . '</h3>';
+            echo '<p>Ngày xuất: ' . date('d/m/Y H:i:s') . '</p>';
+
+            // Bảng dữ liệu
+            echo '<table border="1">';
+            echo '<thead>';
+            echo '<tr>';
             echo '<th>STT</th>';
-            echo '<th>Họ tên</th>';
+            echo '<th>Họ và tên</th>';
             echo '<th>Email</th>';
             echo '<th>Ngày đăng ký</th>';
             echo '<th>Tiến độ</th>';
-            echo '<th>Bài học hoàn thành</th>';
-            echo '<th>Trạng thái</th>';
-            echo '<th>Truy cập gần nhất</th>';
+            echo '<th>Bài học đã hoàn thành</th>';
+            echo '<th>Trạng thái học tập</th>';
+            echo '<th>Trạng thái đăng ký</th>';
             echo '</tr>';
-            
+            echo '</thead>';
+            echo '<tbody>';
+
             $stt = 1;
+            $total_students = count($students);
+            $active_count = 0;
+            $completed_count = 0;
+            $inactive_count = 0;
+            $dropped_count = 0;
+
             foreach ($students as $student) {
-                $progress = $student['progress'] ?? 0;
-                $completed_lessons = $student['completed_lessons'] ?? 0;
-                
-                // Xác định trạng thái
+                $progress = (int) ($student['progress'] ?? 0);
+                $status = $student['status'] ?? 'active';
+
+                // Tính số bài học đã hoàn thành
+                $completed_lessons = $total_lessons > 0 ?
+                    round(($progress / 100) * $total_lessons) : 0;
+
+                // Xác định trạng thái học tập
+                $learning_status = '';
                 if ($progress >= 100) {
-                    $status = 'Đã hoàn thành';
+                    $learning_status = 'Đã hoàn thành';
+                    $completed_count++;
                 } elseif ($progress > 0) {
-                    $status = 'Đang học';
+                    $learning_status = 'Đang học';
+                    $active_count++;
                 } else {
-                    $status = 'Chưa bắt đầu';
+                    $learning_status = 'Chưa bắt đầu';
+                    $inactive_count++;
                 }
-                
+
+                // Trạng thái đăng ký
+                $status_map = [
+                    'active' => 'Đang học',
+                    'completed' => 'Đã hoàn thành',
+                    'dropped' => 'Đã hủy'
+                ];
+                $enrollment_status = $status_map[$status] ?? 'Đang học';
+
+                if ($status === 'dropped') {
+                    $dropped_count++;
+                }
+
+                // Format ngày đăng ký
+                if (!empty($student['enrolled_date'])) {
+                    $enrolled_date = date('d/m/Y', strtotime($student['enrolled_date']));
+                } else {
+                    $enrolled_date = 'N/A';
+                }
+
+                // Thông tin học viên
+                $display_name = $student['fullname'] ?? $student['username'] ?? 'N/A';
+                $display_email = $student['email'] ?? 'N/A';
+
+                // Xuất hàng
                 echo '<tr>';
-                echo '<td>' . $stt++ . '</td>';
-                echo '<td>' . htmlspecialchars($student['fullname'] ?? $student['username'] ?? 'N/A') . '</td>';
-                echo '<td>' . htmlspecialchars($student['email'] ?? 'N/A') . '</td>';
-                echo '<td>' . (!empty($student['enrolled_at']) ? date('d/m/Y', strtotime($student['enrolled_at'])) : 'N/A') . '</td>';
-                echo '<td>' . $progress . '%</td>';
-                echo '<td>' . $completed_lessons . '/' . $total_lessons . '</td>';
-                echo '<td>' . $status . '</td>';
-                echo '<td>' . (!empty($student['last_accessed']) ? date('d/m/Y H:i', strtotime($student['last_accessed'])) : 'Chưa truy cập') . '</td>';
+                echo '<td class="center">' . $stt++ . '</td>';
+                echo '<td>' . htmlspecialchars($display_name) . '</td>';
+                echo '<td>' . htmlspecialchars($display_email) . '</td>';
+                echo '<td class="center">' . $enrolled_date . '</td>';
+                echo '<td class="center">' . $progress . '%</td>';
+                echo '<td class="center">' . $completed_lessons . '/' . $total_lessons . '</td>';
+                echo '<td class="center">' . $learning_status . '</td>';
+                echo '<td class="center">' . $enrollment_status . '</td>';
                 echo '</tr>';
             }
+
+            echo '</tbody>';
             echo '</table>';
-            echo '</body></html>';
+
+            // Thống kê
+            echo '<br>';
+            echo '<h4>THỐNG KÊ</h4>';
+            echo '<p><strong>Tổng học viên:</strong> ' . $total_students . '</p>';
+            echo '<p><strong>Đang học:</strong> ' . $active_count . '</p>';
+            echo '<p><strong>Đã hoàn thành:</strong> ' . $completed_count . '</p>';
+            echo '<p><strong>Chưa bắt đầu:</strong> ' . $inactive_count . '</p>';
+            echo '<p><strong>Đã hủy:</strong> ' . $dropped_count . '</p>';
+            echo '<p><strong>Tổng bài học:</strong> ' . $total_lessons . '</p>';
+
+            echo '</body>';
+            echo '</html>';
             exit;
-            
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi xuất file: " . $e->getMessage();
             header('Location: ?c=student&a=index&course_id=' . $course_id);
             exit;
         }
     }
+    
 }

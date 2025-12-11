@@ -268,7 +268,7 @@ $root_path = '../../';
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-chalkboard-teacher"></i> Quản lý Khóa Học</h1>
-            <a href="?c=instructor&a=createCourse" class="btn">
+            <a href="?c=course&a=create" class="btn">
                 <i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới
             </a>
         </div>
@@ -343,7 +343,7 @@ $root_path = '../../';
                 <i class="fas fa-book-open"></i>
                 <h4 style="color: #95a5a6; margin-bottom: 10px;">Chưa có khóa học nào</h4>
                 <p style="color: #bdc3c7; margin-bottom: 25px;">Bắt đầu bằng cách tạo khóa học đầu tiên của bạn</p>
-                <a href="?c=instructor&a=createCourse" class="btn">
+                <a href="?c=course&a=create" class="btn">
                     <i class="fas fa-plus-circle"></i> Tạo Khóa Học Đầu Tiên
                 </a>
             </div>
@@ -429,7 +429,7 @@ $root_path = '../../';
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="?c=instructor&a=edit&id=<?php echo $course['id']; ?>"
+                                    <a href="?c=course&a=edit&id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-edit" title="Chỉnh sửa">
                                         <i class="fas fa-edit"></i>
                                     </a>
@@ -440,11 +440,11 @@ $root_path = '../../';
                                     </a>
 
                                     <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>"
-                                        class="btn-action btn-students" title="Học viên">
+                                        class="btn-action btn-students" title="Quản lý học viên">
                                         <i class="fas fa-users"></i>
                                     </a>
 
-                                    <form action="?c=instructor&a=delete"
+                                    <form action="?c=course&a=delete"
                                         method="POST"
                                         onsubmit="return confirm('Bạn có chắc muốn xóa khóa học này?');"
                                         style="display: inline;">

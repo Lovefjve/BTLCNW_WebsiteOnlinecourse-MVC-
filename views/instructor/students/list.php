@@ -95,10 +95,6 @@ if (!isset($course)) {
             background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
         }
 
-        .btn-warning {
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-        }
-
         .alert {
             padding: 15px 20px;
             border-radius: 8px;
@@ -340,51 +336,6 @@ if (!isset($course)) {
             font-size: 14px;
         }
 
-        .last-accessed {
-            color: #7f8c8d;
-            font-size: 13px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .btn-action {
-            width: 36px;
-            height: 36px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-action:hover {
-            transform: translateY(-2px);
-            text-decoration: none;
-            color: white;
-        }
-
-        .btn-view {
-            background: #17a2b8;
-            color: white;
-        }
-
-        .btn-message {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-export {
-            background: #6f42c1;
-            color: white;
-        }
-
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -434,6 +385,49 @@ if (!isset($course)) {
             color: #95a5a6;
             font-size: 20px;
         }
+
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+
+        .page-link {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            color: #4a6cf7;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .page-link:hover {
+            background: #4a6cf7;
+            color: white;
+            border-color: #4a6cf7;
+        }
+
+        .page-link.active {
+            background: #4a6cf7;
+            color: white;
+            border-color: #4a6cf7;
+        }
+
+        .page-link.disabled {
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .page-info {
+            margin: 0 15px;
+            color: #6c757d;
+            font-size: 14px;
+        }
     </style>
 </head>
 
@@ -449,11 +443,8 @@ if (!isset($course)) {
                 </div>
             </div>
             <div>
-                <a href="?c=instructor&a=courses" class="btn btn-secondary">
+                <a href="?c=course&a=index" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại
-                </a>
-                <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn">
-                    <i class="fas fa-book-open"></i> Bài học
                 </a>
             </div>
         </div>
@@ -536,39 +527,30 @@ if (!isset($course)) {
                 <table class="students-table">
                     <thead>
                         <tr>
-                            <th width="30%">HỌC VIÊN</th>
-                            <th width="15%">TIẾN ĐỘ</th>
-                            <th width="15%">TRẠNG THÁI</th>
-                            <th width="15%">NGÀY ĐĂNG KÝ</th>
-                            <th width="15%">TRUY CẬP GẦN NHẤT</th>
-                            <th width="10%">HÀNH ĐỘNG</th>
+                            <th width="35%">HỌC VIÊN</th>
+                            <th width="25%">TIẾN ĐỘ</th>
+                            <th width="20%">TRẠNG THÁI HỌC TẬP</th>
+                            <th width="20%">NGÀY ĐĂNG KÝ</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($students as $student): 
+                        <?php foreach ($students as $index => $student): ?>
+                            <?php
                             // Lấy chữ cái đầu tiên cho avatar
-                            $first_letter = strtoupper(substr($student['fullname'] ?? $student['username'] ?? '?', 0, 1));
-                            
-                            // Xác định trạng thái
-                            $status_class = 'status-inactive';
-                            $status_text = 'Chưa bắt đầu';
-                            
-                            if ($student['progress'] >= 100) {
-                                $status_class = 'status-completed';
-                                $status_text = 'Đã hoàn thành';
-                            } elseif ($student['progress'] > 0) {
-                                $status_class = 'status-active';
-                                $status_text = 'Đang học';
-                            }
-                            
+                            $first_letter = strtoupper(substr($student['display_name'] ?? '?', 0, 1));
+
+                            // Sử dụng các biến đã được tính trong controller
+                            $progress = (int) ($student['progress'] ?? 0);
+                            $completed_lessons = $student['completed_lessons'] ?? 0;
+                            $learning_status_text = $student['learning_status_text'] ?? 'Chưa bắt đầu';
+                            $learning_status = $student['learning_status'] ?? 'inactive';
+
+                            // Xác định class CSS cho trạng thái học tập
+                            $status_class = 'status-' . $learning_status;
+
                             // Format ngày đăng ký
-                            $enrolled_date = !empty($student['enrolled_at']) ? 
-                                date('d/m/Y', strtotime($student['enrolled_at'])) : 'N/A';
-                            
-                            // Format ngày truy cập gần nhất
-                            $last_accessed = !empty($student['last_accessed']) ? 
-                                date('d/m/Y H:i', strtotime($student['last_accessed'])) : 'Chưa truy cập';
-                        ?>
+                            $enrolled_date = $student['enrolled_date_formatted'] ?? 'N/A';
+                            ?>
                             <tr>
                                 <td>
                                     <div class="student-info">
@@ -577,28 +559,28 @@ if (!isset($course)) {
                                         </div>
                                         <div>
                                             <div class="student-name">
-                                                <?php echo htmlspecialchars($student['fullname'] ?? $student['username'] ?? 'Không có tên'); ?>
+                                                <?php echo htmlspecialchars($student['display_name']); ?>
                                             </div>
                                             <div class="student-email">
-                                                <?php echo htmlspecialchars($student['email'] ?? 'Không có email'); ?>
+                                                <?php echo htmlspecialchars($student['display_email']); ?>
                                             </div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="progress-text">
-                                        <?php echo number_format($student['progress'] ?? 0, 0); ?>%
+                                        <?php echo $progress; ?>%
                                     </div>
                                     <div class="progress-container">
-                                        <div class="progress-bar" style="width: <?php echo $student['progress'] ?? 0; ?>%"></div>
+                                        <div class="progress-bar" style="width: <?php echo min($progress, 100); ?>%"></div>
                                     </div>
                                     <div class="completed-lessons">
-                                        <?php echo $student['completed_lessons'] ?? 0; ?>/<?php echo $total_lessons ?? 0; ?> bài học
+                                        <?php echo $completed_lessons; ?>/<?php echo $total_lessons ?? 0; ?> bài học
                                     </div>
                                 </td>
                                 <td>
                                     <span class="status-badge <?php echo $status_class; ?>">
-                                        <?php echo $status_text; ?>
+                                        <?php echo $learning_status_text; ?>
                                     </span>
                                 </td>
                                 <td>
@@ -606,33 +588,41 @@ if (!isset($course)) {
                                         <?php echo $enrolled_date; ?>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="last-accessed">
-                                        <?php echo $last_accessed; ?>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <!-- Xem tiến độ chi tiết -->
-                                        <a href="?c=student&a=progress&course_id=<?php echo $course['id']; ?>&student_id=<?php echo $student['id']; ?>" 
-                                           class="btn-action btn-view" 
-                                           title="Xem tiến độ">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        
-                                        <!-- Nhắn tin (nếu có chức năng) -->
-                                        <a href="#" 
-                                           class="btn-action btn-message" 
-                                           title="Nhắn tin"
-                                           onclick="alert('Chức năng đang phát triển')">
-                                            <i class="fas fa-envelope"></i>
-                                        </a>
-                                    </div>
-                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                <!-- PHÂN TRANG -->
+                <?php if (isset($total_pages) && $total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php if (isset($current_page) && $current_page > 1): ?>
+                            <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page - 1; ?>"
+                                class="page-link">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="page-link disabled">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        <?php endif; ?>
+
+                        <span class="page-info">
+                            Trang <?php echo $current_page ?? 1; ?> / <?php echo $total_pages ?? 1; ?>
+                        </span>
+
+                        <?php if (isset($current_page) && $current_page < $total_pages): ?>
+                            <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page + 1; ?>"
+                                class="page-link">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <?php else: ?>
+                            <span class="page-link disabled">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
 
@@ -644,8 +634,8 @@ if (!isset($course)) {
             <div style="display: flex; gap: 20px; align-items: flex-start;">
                 <div class="course-thumbnail">
                     <?php if (!empty($course['image'])): ?>
-                        <img src="assets/uploads/courses/<?php echo $course['image']; ?>" 
-                             alt="<?php echo htmlspecialchars($course['title']); ?>">
+                        <img src="assets/uploads/courses/<?php echo $course['image']; ?>"
+                            alt="<?php echo htmlspecialchars($course['title']); ?>">
                     <?php else: ?>
                         <i class="fas fa-book"></i>
                     <?php endif; ?>

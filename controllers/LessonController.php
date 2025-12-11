@@ -2,7 +2,19 @@
 // controllers/LessonController.php
 
 class LessonController {
-    
+
+    private function render($viewPath, $data = [])
+    {
+        extract($data);
+        $fullPath = "views/{$viewPath}.php";
+        
+        if (!file_exists($fullPath)) {
+            die("Lỗi: Không tìm thấy view '{$viewPath}'");
+        }
+        
+        require_once $fullPath;
+    }
+
     public function index() {
         // Kiểm tra quyền
         if (($_SESSION['role'] ?? 0) != 1) {
@@ -64,24 +76,14 @@ class LessonController {
         // echo "</pre>";
         
         // Hiển thị view - TRUYỀN BIẾN ĐẦY ĐỦ theo đúng tên biến view cần
-        $data = [
+        
+        $this->render('instructor/lessons/manage', [
             'course' => $course,
             'course_title' => $course['title'] ?? 'Khóa học',
             'course_id' => $course_id,
             'lessons' => $lessons,
             'total_lessons' => $total_lessons,
-        ];
-        
-        // Dùng extract() để chuyển mảng thành biến
-        extract($data);
-        
-        // Kiểm tra file view tồn tại
-        $view_file = 'views/instructor/lessons/manage.php';
-        if (!file_exists($view_file)) {
-            die("View file không tồn tại: $view_file");
-        }
-        
-        require_once $view_file;
+        ]);
     }
     
     public function create() {
@@ -148,15 +150,12 @@ class LessonController {
         }
         
         // Hiển thị view
-        $data = [
+        $this->render('instructor/lessons/create', [
             'course' => $course,
             'next_order' => $next_order,
             'errors' => $errors,
             'old_input' => $old_input
-        ];
-        
-        extract($data);
-        require_once 'views/instructor/lessons/create.php';
+        ]);
     }
     
     public function store() {
@@ -287,15 +286,12 @@ class LessonController {
         }
         
         // Hiển thị view
-        $data = [
+        $this->render('instructor/lessons/edit', [
             'course' => $course,
             'lesson' => $lesson,
             'errors' => $errors,
             'old_input' => $old_input
-        ];
-        
-        extract($data);
-        require_once 'views/instructor/lessons/edit.php';
+        ]);
     }
     
     public function update() {

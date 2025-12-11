@@ -16,6 +16,19 @@ class MaterialController {
             exit;
         }
     }
+
+    // ========== THÊM PHƯƠNG THỨC RENDER VÀO ĐÂY ==========
+    private function render($viewPath, $data = [])
+    {
+        extract($data);
+        $fullPath = "views/{$viewPath}.php";
+        
+        if (!file_exists($fullPath)) {
+            die("Lỗi: Không tìm thấy view '{$viewPath}'");
+        }
+        
+        require_once $fullPath;
+    }
     
     public function index() {
         // Kiểm tra quyền
@@ -82,7 +95,8 @@ class MaterialController {
         }
         
         // Hiển thị view - TRUYỀN BIẾN ĐẦY ĐỦ theo đúng tên biến view cần
-        $data = [
+        
+        $this->render('instructor/materials/upload', [
             'course' => $course,
             'course_title' => $course['title'] ?? 'Khóa học',
             'course_id' => $course['id'],
@@ -91,18 +105,7 @@ class MaterialController {
             'lesson_id' => $lesson_id,
             'materials' => $materials,
             'total_materials' => $total_materials,
-        ];
-        
-        // Dùng extract() để chuyển mảng thành biến
-        extract($data);
-        
-        // Kiểm tra file view tồn tại
-        $view_file = 'views/instructor/materials/upload.php';
-        if (!file_exists($view_file)) {
-            die("View file không tồn tại: $view_file");
-        }
-        
-        require_once $view_file;
+        ]);
     }
     
     public function store() {
