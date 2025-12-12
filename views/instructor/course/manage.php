@@ -1,9 +1,3 @@
-<?php
-// views/instructor/course/manage.php
-
-$root_path = '../../';
-?>
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -31,18 +25,41 @@ $root_path = '../../';
             border-radius: 10px;
             margin-bottom: 25px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             border-left: 5px solid #4a6cf7;
         }
 
-        .header h1 {
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .header-left h1 {
             color: #2c3e50;
             font-size: 28px;
             display: flex;
             align-items: center;
             gap: 12px;
+            margin: 0 0 10px 0;
+        }
+
+        .course-info h3 {
+            color: #4a6cf7;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 15px 0;
+            padding-left: 34px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -58,6 +75,7 @@ $root_path = '../../';
             font-weight: 600;
             font-size: 15px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .btn:hover {
@@ -65,6 +83,24 @@ $root_path = '../../';
             text-decoration: none;
             color: white;
             box-shadow: 0 6px 20px rgba(74, 108, 247, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268 0%, #343a40 100%);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ba97e 100%);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
 
         .alert {
@@ -159,6 +195,12 @@ $root_path = '../../';
             font-weight: 700;
         }
 
+        .stat-info p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
         .courses-table {
             width: 100%;
             background: white;
@@ -202,7 +244,6 @@ $root_path = '../../';
             background: #fff3cd;
             color: #856404;
         }
-
 
         .action-buttons {
             display: flex;
@@ -253,6 +294,8 @@ $root_path = '../../';
             padding: 60px 20px;
             background: white;
             border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
         }
 
         .empty-state i {
@@ -260,17 +303,70 @@ $root_path = '../../';
             color: #e0e0e0;
             margin-bottom: 20px;
         }
+
+        .empty-state h4 {
+            color: #95a5a6;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .empty-state p {
+            color: #bdc3c7;
+            margin-bottom: 25px;
+            font-size: 15px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-header {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .course-count-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container">
+        <!-- Header với nút quay về Dashboard -->
         <div class="header">
-            <h1><i class="fas fa-chalkboard-teacher"></i> Quản lý Khóa Học</h1>
-            <a href="?c=course&a=create" class="btn">
-                <i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới
-            </a>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1><i class="fas fa-chalkboard-teacher"></i> Quản lý Khóa Học</h1>
+                </div>
+                <div class="btn-group">
+                    <!-- NÚT QUAY VỀ DASHBOARD -->
+                    <a href="?c=instructor&a=dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay về Dashboard
+                    </a>
+                    <!-- NÚT TẠO KHÓA HỌC MỚI -->
+                    <a href="?c=course&a=create" class="btn">
+                        <i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới
+                    </a>
+                </div>
+            </div>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
@@ -287,6 +383,7 @@ $root_path = '../../';
             </div>
         <?php endif; ?>
 
+        <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card total">
                 <div class="stat-icon">
@@ -329,23 +426,28 @@ $root_path = '../../';
             </div>
         </div>
 
-        <div style="margin-bottom: 20px; padding: 20px; background: white; border-radius: 10px;">
-            <h3 style="margin-bottom: 15px; color: #2c3e50;">
+        <!-- Courses List Header -->
+        <div class="section-header">
+            <h3>
                 <i class="fas fa-list"></i> Danh sách khóa học của bạn
-                <span style="background: #e3f2fd; color: #1976d2; padding: 4px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px;">
-                    <?php echo $totalCourses; ?> khóa học
-                </span>
+                <span class="course-count-badge"><?php echo $totalCourses; ?> khóa học</span>
             </h3>
         </div>
 
+        <!-- Courses Table -->
         <?php if (empty($courses)): ?>
             <div class="empty-state">
                 <i class="fas fa-book-open"></i>
-                <h4 style="color: #95a5a6; margin-bottom: 10px;">Chưa có khóa học nào</h4>
-                <p style="color: #bdc3c7; margin-bottom: 25px;">Bắt đầu bằng cách tạo khóa học đầu tiên của bạn</p>
-                <a href="?c=course&a=create" class="btn">
-                    <i class="fas fa-plus-circle"></i> Tạo Khóa Học Đầu Tiên
-                </a>
+                <h4>Chưa có khóa học nào</h4>
+                <p>Bắt đầu bằng cách tạo khóa học đầu tiên của bạn. Mỗi khóa học có thể chứa nhiều bài học, tài liệu và bài tập cho học viên.</p>
+                <div class="btn-group" style="justify-content: center;">
+                    <a href="?c=instructor&a=dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay về Dashboard
+                    </a>
+                    <a href="?c=course&a=create" class="btn">
+                        <i class="fas fa-plus-circle"></i> Tạo Khóa Học Đầu Tiên
+                    </a>
+                </div>
             </div>
         <?php else: ?>
             <table class="courses-table">
@@ -365,9 +467,9 @@ $root_path = '../../';
                         <tr>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 15px;">
-                                    <div style="width: 80px; height: 45px; border-radius: 6px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 80px; height: 45px; border-radius: 6px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                                         <?php if (!empty($course['image'])): ?>
-                                            <img src="assets/uploads/courses/<?php echo $course['image']; ?>"
+                                            <img src="assets/uploads/courses/<?php echo htmlspecialchars($course['image']); ?>"
                                                 alt="<?php echo htmlspecialchars($course['title']); ?>"
                                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px;">
                                         <?php else: ?>
@@ -375,13 +477,15 @@ $root_path = '../../';
                                         <?php endif; ?>
                                     </div>
                                     <div>
-                                        <h4 style="margin: 0 0 5px; color: #2c3e50;"><?php echo htmlspecialchars($course['title']); ?></h4>
+                                        <h4 style="margin: 0 0 5px; color: #2c3e50;">
+                                            <?php echo htmlspecialchars($course['title']); ?>
+                                        </h4>
                                         <div style="display: flex; gap: 10px;">
                                             <span style="background: #e3f2fd; color: #1976d2; padding: 3px 10px; border-radius: 12px; font-size: 12px;">
-                                                <?php echo $course['category_name']; ?>
+                                                <?php echo htmlspecialchars($course['category_name'] ?? 'Chưa phân loại'); ?>
                                             </span>
                                             <span style="background: #e8f5e9; color: #2e7d32; padding: 3px 10px; border-radius: 12px; font-size: 12px;">
-                                                <?php echo $course['level']; ?>
+                                                <?php echo htmlspecialchars($course['level'] ?? 'Cơ bản'); ?>
                                             </span>
                                         </div>
                                     </div>
@@ -391,14 +495,16 @@ $root_path = '../../';
                                 <?php
                                 $status_class = '';
                                 $status_text = '';
-
-
+                                
                                 if ($course['status'] === 'published') {
                                     $status_class = 'status-published';
                                     $status_text = 'Đã xuất bản';
                                 } elseif ($course['status'] === 'pending') {
                                     $status_class = 'status-pending';
                                     $status_text = 'Chờ duyệt';
+                                } else {
+                                    $status_class = 'status-pending';
+                                    $status_text = 'Nháp';
                                 }
                                 ?>
                                 <span class="status-badge <?php echo $status_class; ?>">
@@ -406,7 +512,9 @@ $root_path = '../../';
                                 </span>
                             </td>
                             <td>
-                                <span style="font-weight: 600; color: #2c3e50;"><?php echo $course['student_count']; ?></span>
+                                <span style="font-weight: 600; color: #2c3e50;">
+                                    <?php echo $course['student_count']; ?>
+                                </span>
                             </td>
                             <td>
                                 <?php if ($course['price'] > 0): ?>
@@ -477,5 +585,4 @@ $root_path = '../../';
         }
     </script>
 </body>
-
 </html>

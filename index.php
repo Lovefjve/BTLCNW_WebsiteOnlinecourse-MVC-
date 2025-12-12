@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$controller = $_GET['c'] ?? 'course';
-$action = $_GET['a'] ?? 'index';
+$controller = $_GET['c'] ?? 'instructor';
+$action = $_GET['a'] ?? 'dashboard';
 
 // ========== InstructorController (DASHBOARD) ==========
 if ($controller === 'instructor') {
@@ -19,6 +19,7 @@ if ($controller === 'instructor') {
     $actionMap = [
         'dashboard' => 'dashboard',   // Trang chủ instructor
         'profile' => 'profile',       // Hồ sơ giảng viên
+        'logout' => 'logout',         // Đăng xuất - THÊM VÀO ĐÂY
         'settings' => 'settings'      // Cài đặt
     ];
 
@@ -31,7 +32,7 @@ if ($controller === 'instructor') {
     }
 }
 
-// ========== CourseController (MỚI) ==========
+// ========== CourseController ==========
 elseif ($controller === 'course') {
     require_once 'controllers/CourseController.php';
     $courseController = new CourseController();
@@ -42,7 +43,8 @@ elseif ($controller === 'course') {
         'store' => 'store',         // Lưu khóa học mới
         'edit' => 'edit',           // Form sửa khóa học
         'update' => 'update',       // Cập nhật khóa học
-        'delete' => 'delete'        // Xóa khóa học (GIỮ NGUYÊN)
+        'delete' => 'delete',       // Xóa khóa học
+        'viewAll' => 'viewAll'      // Xem tất cả khóa học (cho testing) - THÊM NẾU CẦN
     ];
 
     $method = $actionMap[$action] ?? 'index';
@@ -118,7 +120,14 @@ elseif ($controller === 'student') {
 }
 
 // ========== AuthController (nếu có) ==========
+elseif ($controller === 'auth') {
+    
+}
 
+// ========== CategoryController (nếu có) ==========
+elseif ($controller === 'category') {
+    
+}
 
 // ========== DEFAULT/ERROR ==========
 else {
