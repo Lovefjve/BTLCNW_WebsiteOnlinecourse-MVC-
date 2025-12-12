@@ -22,26 +22,34 @@ class InstructorController
             session_start();
         }
 
-        // FAKE LOGIN - Tự động tạo session nếu chưa có
-        if (!isset($_SESSION['user_id']) || !isset($_SESSION['role'])) {
-            $_SESSION['user_id'] = 2; // Giảng viên ID = 2
-            $_SESSION['full_name'] = 'Nguyễn Văn An'; // Sửa tên thật từ DB
-            $_SESSION['email'] = 'gv1@example.com'; // Sửa email thật từ DB
-            $_SESSION['role'] = 1; // 1 = giảng viên
+        // KIỂM TRA: Nếu session cũ không phải ID muốn test
+        $desired_test_id = 3; // ID muốn test
+
+        if (!isset($_SESSION['user_id']) || $_SESSION['user_id'] != $desired_test_id) {
+            // Reset session về ID muốn test
+            $_SESSION['user_id'] = $desired_test_id;
+            $_SESSION['role'] = 1;
+            $_SESSION['is_fake'] = true;
+            $_SESSION['info'] = "Đã chuyển sang test với ID=" . $desired_test_id;
         }
+        // if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? 0) != 1) {
+        //     header('Location: ?c=auth&a=login');
+        //     exit;
+        // }
     }
 
-    // ========== DASHBOARD ==========
-    // ========== DASHBOARD ==========
+
+
     // ========== DASHBOARD ==========
     public function dashboard()
     {
-        // Lấy instructor_id từ session (mặc định là 2)
-        $instructorId = $_SESSION['user_id'] ?? 2;
+        // Lấy instructor_id từ session (đã được fake nếu chưa có)
+        $instructorId = $_SESSION['user_id'];
 
         // DEBUG
         error_log("=== DASHBOARD LOADING ===");
         error_log("Instructor ID: " . $instructorId);
+        error_log("Is fake login: " . ($_SESSION['is_fake'] ?? 'false'));
 
         try {
             // Load model Course
@@ -63,10 +71,6 @@ class InstructorController
                 // CÓ dữ liệu từ DB - sử dụng dữ liệu THẬT
                 error_log("✅ Sử dụng dữ liệu THẬT từ database");
 
-                // Đảm bảo stats có đủ fields
-                if (!isset($stats['total_revenue'])) {
-                    $stats['total_revenue'] = 0;
-                }
 
                 // DEBUG thông tin dữ liệu thật
                 foreach ($recentCourses as $index => $course) {
@@ -107,7 +111,6 @@ class InstructorController
                     'published_courses' => 2,
                     'pending_courses' => 0,
                     'total_students' => 43,
-                    'total_revenue' => 0
                 ];
 
                 if (!isset($_SESSION['sample_data_shown'])) {
@@ -124,7 +127,6 @@ class InstructorController
                 'published_courses' => 0,
                 'pending_courses' => 0,
                 'total_students' => 0,
-                'total_revenue' => 0
             ];
             $recentCourses = [];
         }
@@ -153,18 +155,15 @@ class InstructorController
     // ========== LOGOUT ==========
     public function logout()
     {
-        // Xóa tất cả session
+        // Xóa session
         session_destroy();
 
-        // Xóa tất cả session variables
-        $_SESSION = [];
-
-        // Tạo session mới để chứa thông báo
+        // Tạo session mới
         session_start();
         $_SESSION['info'] = "Đã đăng xuất thành công";
 
-        // Chuyển hướng đến trang dashboard (sẽ tự động fake login lại)
-        header('Location: ?c=instructor&a=dashboard');
+        // Về trang chủ (không về dashboard ngay)
+        header('Location: ?c=home&a=index');
         exit;
     }
 }

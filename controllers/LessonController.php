@@ -3,6 +3,18 @@
 
 class LessonController {
 
+    public function __construct()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? 0) != 1) {
+            header('Location: ?c=auth&a=login');
+            exit;
+        }
+    }
+    
     private function render($viewPath, $data = [])
     {
         extract($data);
