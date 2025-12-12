@@ -66,6 +66,38 @@ switch ($request) {
         $controller = new AdminController();
         $controller->manageUsers();
         break;
+    case '/admin/categories':
+        $controller = new CategoryController();
+        $controller->manageCategories();
+        break;
+    case '/admin/courses':
+        $controller = new CourseController();
+        $controller->manageCourses();
+        break;
+    case '/admin/courses/detail':
+        $controller = new CourseController();
+        $controller->courseDetail();
+        break;
+    case '/admin/courses/approve':
+        $controller = new CourseController();
+        $controller->approveCourse();
+        break;
+    case '/admin/courses/reject':
+        $controller = new CourseController();
+        $controller->rejectCourse();
+        break;
+    case '/admin/categories/create':
+        $controller = new CategoryController();
+        $controller->createCategory();
+        break;
+    case '/admin/categories/edit':
+        $controller = new CategoryController();
+        $controller->editCategory();
+        break;
+    case '/admin/categories/delete':
+        $controller = new CategoryController();
+        $controller->deleteCategory();
+        break;
     case '/admin/createUser':
         $controller = new AdminController();
         $controller->createUser();
