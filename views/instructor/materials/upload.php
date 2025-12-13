@@ -1,16 +1,30 @@
-<?php require_once __DIR__ . "/../../layouts/header.php"; ?>
-<?php require_once __DIR__ . "/../../layouts/sidebar.php"; ?>
+<div class="panel">
+  <h3>Tải tài liệu</h3>
 
-<h2>Upload tài liệu bài học</h2>
+  <form enctype="multipart/form-data">
+    <label>Tên tài liệu</label>
+    <input type="text">
 
-<form action="/materials/upload" method="POST" enctype="multipart/form-data">
-    <label>ID bài học</label>
-    <input type="number" name="lesson_id" required>
+    <label>File</label>
+    <input type="file">
 
-    <label>Chọn file</label>
-    <input type="file" name="material" accept=".pdf,.doc,.ppt,.pptx" required>
+    <button class="btn btn-primary">Upload</button>
+  </form>
 
-    <button type="submit">Upload</button>
-</form>
+  <hr>
 
-<?php require_once __DIR__ . "/../../layouts/footer.php"; ?>
+  <table class="table">
+    <tr>
+      <th>Tên</th>
+      <th>File</th>
+      <th>Hành động</th>
+    </tr>
+    <tr>
+      <td>Tài liệu PHP</td>
+      <td>php.pdf</td>
+      <td>
+        <button class="btn small btn-ghost js-delete">Xóa</button>
+      </td>
+    </tr>
+  </table>
+</div>

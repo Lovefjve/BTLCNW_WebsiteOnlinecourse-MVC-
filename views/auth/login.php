@@ -20,6 +20,6 @@
     </form>
   </main>
 
-  <script src="main.js" defer></script>
+  <script src="/assets/js/script.js" defer></script>
 </body>
 </html>

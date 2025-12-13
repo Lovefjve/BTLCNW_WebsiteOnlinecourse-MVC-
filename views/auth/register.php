@@ -31,11 +31,11 @@
       <button type="submit">Đăng ký</button>
 
       <p class="form-footer">
-        Đã có tài khoản? <a href="login.html">Đăng nhập</a>
+        Đã có tài khoản? <a href="./../auth/login.php">Đăng nhập</a>
       </p>
     </form>
   </main>
 
-  <script src="main.js" defer></script>
+  <script src="/assets/js/script.js" defer></script>
 </body>
 </html>

@@ -511,3 +511,164 @@ body h1 {
   .sidebar { width:100%; height:auto; position:relative; top:0; }
 }
 
+/* ===== INSTRUCTOR DASHBOARD ===== */
+.instructor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.instructor-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #0f1115;
+}
+
+/* create course button */
+.btn-add-course {
+  background: #00c853;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn-add-course:hover {
+  background: #00e676;
+}
+
+/* create / edit form */
+.course-form {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  margin-bottom: 20px;
+  display: none;
+}
+
+.course-form.active {
+  display: block;
+}
+
+.course-form label {
+  display: block;
+  font-size: 14px;
+  margin: 10px 0 6px;
+}
+
+.course-form input,
+.course-form textarea,
+.course-form select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.course-form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* instructor course list */
+.instructor-courses {
+  display: grid;
+  gap: 14px;
+}
+
+.instructor-course-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  padding: 14px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.instructor-course-item h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.instructor-course-item .muted {
+  font-size: 13px;
+  color: #777;
+}
+
+.course-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===== COURSES UI ===== */
+.page-title {
+  margin: 90px 0 20px;
+  font-size: 32px;
+}
+
+.course-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.course-info {
+  padding: 14px;
+}
+
+.course-info h3 {
+  font-size: 17px;
+  margin: 8px 0;
+}
+
+.course-info .meta {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 8px;
+}
+
+.course-detail-header {
+  margin-top: 90px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 40px;
+}
+
+.course-detail-header img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.course-desc {
+  margin: 12px 0;
+  color: #555;
+}
+
+.course-info-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.course-info-list li {
+  margin-bottom: 6px;
+}
+
+.course-content-section {
+  margin-top: 40px;
+}
+
+.course-content-section ul {
+  padding-left: 20px;
+}
+
+@media (max-width: 900px) {
+  .course-detail-header {
+    grid-template-columns: 1fr;
+  }
+}
