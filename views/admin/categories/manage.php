@@ -64,10 +64,10 @@
                 <tbody>
                     <?php foreach ($categories as $c): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($c['id']); ?></td>
-                            <td><?php echo htmlspecialchars($c['name']); ?></td>
-                            <td><?php echo htmlspecialchars($c['description']); ?></td>
-                            <td><?php echo htmlspecialchars($c['created_at']); ?></td>
+                            <td><?php echo htmlspecialchars((string)($c['id'] ?? '')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($c['name'] ?? '')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($c['description'] ?? '')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($c['created_at'] ?? '')); ?></td>
                             <td class="actions">
                                 <a class="btn-edit" href="<?php echo BASE_URL; ?>/admin/categories/edit?id=<?php echo $c['id']; ?>">Sửa</a>
                                 <form action="<?php echo BASE_URL; ?>/admin/categories/delete" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa danh mục này?');" style="display:inline;">

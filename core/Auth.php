@@ -1,5 +1,8 @@
 <?php
-session_start();
+// Guard session start to avoid 'session already active' notices.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 class Auth {
     // Khởi tạo session
