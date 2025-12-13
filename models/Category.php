@@ -1,60 +1,87 @@
 <?php
-require_once 'core/Model.php';
+// Canonical Category model merged. Require the project's Database helper from config.
+require_once __DIR__ . '/../config/Database.php';
 
-class Category extends Model {
-    // Lấy tất cả danh mục
+class Category {
+    private $pdo;
+    private $table = 'categories';
+
+    public function __construct() {
+        $db = new Database();
+        $this->pdo = $db->getConnection();
+    }
+
+    // Return all categories (ordered by name)
     public function getAll() {
-        $query = 'SELECT * FROM categories ORDER BY created_at DESC';
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->pdo->prepare("SELECT id, name, description FROM {$this->table} ORDER BY name ASC");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Category::getAll error: ' . $e->getMessage());
+            return [];
+        }
     }
 
-    // Lấy danh mục theo id
     public function getById($id) {
-        $query = 'SELECT * FROM categories WHERE id = :id LIMIT 1';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE id = :id LIMIT 1");
+            $stmt->bindValue(':id', (int)$id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Category::getById error: ' . $e->getMessage());
+            return null;
+        }
     }
 
-    // Tìm theo tên
     public function findByName($name) {
-        $query = 'SELECT * FROM categories WHERE name = :name LIMIT 1';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':name', $name);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE name = :name LIMIT 1");
+            $stmt->execute([':name' => $name]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Category::findByName error: ' . $e->getMessage());
+            return null;
+        }
     }
 
-
-    // Tạo danh mục mới
     public function create($data) {
-        $query = 'INSERT INTO categories (name, description) VALUES (:name, :description)';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("INSERT INTO {$this->table} (name, description, created_at) VALUES (:name, :description, NOW())");
+            return $stmt->execute([
+                ':name' => $data['name'],
+                ':description' => $data['description'] ?? ''
+            ]);
+        } catch (PDOException $e) {
+            error_log('Category::create error: ' . $e->getMessage());
+            return false;
+        }
     }
 
-    // Cập nhật danh mục
     public function update($id, $data) {
-        $query = 'UPDATE categories SET name = :name, description = :description WHERE id = :id';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':name', $data['name']);
-        $stmt->bindParam(':description', $data['description']);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("UPDATE {$this->table} SET name = :name, description = :description, updated_at = NOW() WHERE id = :id");
+            return $stmt->execute([
+                ':name' => $data['name'],
+                ':description' => $data['description'] ?? '',
+                ':id' => (int)$id
+            ]);
+        } catch (PDOException $e) {
+            error_log('Category::update error: ' . $e->getMessage());
+            return false;
+        }
     }
 
-    // Xóa danh mục
     public function delete($id) {
-        $query = 'DELETE FROM categories WHERE id = :id';
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        return $stmt->execute();
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE id = :id");
+            return $stmt->execute([':id' => (int)$id]);
+        } catch (PDOException $e) {
+            error_log('Category::delete error: ' . $e->getMessage());
+            return false;
+        }
     }
-
-    // (No slugify needed with current schema)
 }
+
+?>

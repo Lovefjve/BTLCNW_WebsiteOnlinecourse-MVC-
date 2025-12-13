@@ -1,122 +1,108 @@
 <?php
-// Enable output buffering to avoid "headers already sent" issues from accidental whitespace
-ob_start();
-// Khởi tạo các hằng số
-define('BASE_URL', 'http://localhost/onlinecourse');
+// file_chung/index.php - canonical front controller
+// This merged router preserves the project's REQUEST_URI exact routes,
+// supports pretty URLs (?url=...) used by Huy, and the query-style
+// ?c=controller&a=action used by Duc. Put this file into the project root
+// to replace or to use as the canonical router.
 
-// Autoload các class
+// Basic dev-friendly settings
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+if (session_status() === PHP_SESSION_NONE) session_start();
+
+// Define BASE_URL for views and controllers if not already defined.
+if (!defined('BASE_URL')) {
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $base = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    // Normalize root to empty string
+    if ($base === '/' || $base === '.') $base = '';
+    define('BASE_URL', $base);
+}
+
+// Autoloader similar to project to resolve core/controllers/models
 spl_autoload_register(function ($class_name) {
-    $directories = ['core/', 'controllers/', 'models/'];
-    
+    // Autoload from this project's folders. Previous code used ".." and missed the
+    // actual controllers/models directory when index.php is in the project root.
+    $directories = [__DIR__ . '/core/', __DIR__ . '/controllers/', __DIR__ . '/models/'];
     foreach ($directories as $dir) {
         $file = $dir . $class_name . '.php';
-        if (file_exists($file)) {
-            require_once $file;
-            return;
-        }
+        if (file_exists($file)) { require_once $file; return; }
     }
 });
 
-// Xử lý routing đơn giản
-$request = $_SERVER['REQUEST_URI'];
-$method = $_SERVER['REQUEST_METHOD'];
+// --- Part A: exact path switch (project's existing routes) ---
+$request = $_SERVER['REQUEST_URI'] ?? '/';
+$request = str_replace('/onlinecourse', '', $request); // if deployed under /onlinecourse
+$requestPath = strtok($request, '?');
 
-// Loại bỏ base url nếu có
-$request = str_replace('/onlinecourse', '', $request);
-
-// Loại bỏ query string từ request path
-$request = strtok($request, '?');
-
-// Routing
-switch ($request) {
+switch ($requestPath) {
     case '/':
     case '':
-        $controller = new HomeController();
-        $controller->index();
+        if (class_exists('HomeController')) { (new HomeController())->index(); exit; }
         break;
-    case '/auth/register':
-        $controller = new AuthController();
-        $controller->register();
-        break;
-    case '/auth/postRegister':
-        $controller = new AuthController();
-        $controller->postRegister();
-        break;
-    case '/auth/login':
-        $controller = new AuthController();
-        $controller->login();
-        break;
-    case '/auth/postLogin':
-        $controller = new AuthController();
-        $controller->postLogin();
-        break;
-    case '/student/dashboard':
-        $controller = new StudentController();
-        $controller->dashboard();
-        break;
-    case '/instructor/dashboard':
-        $controller = new InstructorController();
-        $controller->dashboard();
-        break;
-    case '/admin/dashboard':
-        $controller = new AdminController();
-        $controller->dashboard();
-        break;
-    case '/admin/users':
-        $controller = new AdminController();
-        $controller->manageUsers();
-        break;
-    case '/admin/categories':
-        $controller = new CategoryController();
-        $controller->manageCategories();
-        break;
-    case '/admin/courses':
-        $controller = new CourseController();
-        $controller->manageCourses();
-        break;
-    case '/admin/courses/detail':
-        $controller = new CourseController();
-        $controller->courseDetail();
-        break;
-    case '/admin/courses/approve':
-        $controller = new CourseController();
-        $controller->approveCourse();
-        break;
-    case '/admin/courses/reject':
-        $controller = new CourseController();
-        $controller->rejectCourse();
-        break;
-    case '/admin/categories/create':
-        $controller = new CategoryController();
-        $controller->createCategory();
-        break;
-    case '/admin/categories/edit':
-        $controller = new CategoryController();
-        $controller->editCategory();
-        break;
-    case '/admin/categories/delete':
-        $controller = new CategoryController();
-        $controller->deleteCategory();
-        break;
-    case '/admin/createUser':
-        $controller = new AdminController();
-        $controller->createUser();
-        break;
-    case '/admin/editUser':
-        $controller = new AdminController();
-        $controller->editUser();
-        break;
-    case '/admin/deleteUser':
-        $controller = new AdminController();
-        $controller->deleteUser();
-        break;
-    case '/auth/logout':
-        $controller = new AuthController();
-        $controller->logout();
-        break;
-    default:
-        http_response_code(404);
-        echo '404 Not Found';
-        break;
+    case '/auth/register': if (class_exists('AuthController')) { (new AuthController())->register(); exit; } break;
+    case '/auth/postRegister': if (class_exists('AuthController')) { (new AuthController())->postRegister(); exit; } break;
+    case '/auth/login': if (class_exists('AuthController')) { (new AuthController())->login(); exit; } break;
+    case '/auth/postLogin': if (class_exists('AuthController')) { (new AuthController())->postLogin(); exit; } break;
+    case '/student/dashboard': if (class_exists('StudentController')) { (new StudentController())->dashboard(); exit; } break;
+    case '/instructor/dashboard': if (class_exists('InstructorController')) { (new InstructorController())->dashboard(); exit; } break;
+    case '/admin/dashboard': if (class_exists('AdminController')) { (new AdminController())->dashboard(); exit; } break;
+    case '/admin/users': if (class_exists('AdminController')) { (new AdminController())->manageUsers(); exit; } break;
+    case '/admin/categories': if (class_exists('CategoryController')) { (new CategoryController())->manageCategories(); exit; } break;
+    case '/admin/courses': if (class_exists('CourseController')) { (new CourseController())->manageCourses(); exit; } break;
+    case '/admin/courses/detail': if (class_exists('CourseController')) { (new CourseController())->courseDetail(); exit; } break;
+    case '/admin/courses/approve': if (class_exists('CourseController')) { (new CourseController())->approveCourse(); exit; } break;
+    case '/admin/courses/reject': if (class_exists('CourseController')) { (new CourseController())->rejectCourse(); exit; } break;
+    case '/admin/categories/create': if (class_exists('CategoryController')) { (new CategoryController())->createCategory(); exit; } break;
+    case '/admin/categories/edit': if (class_exists('CategoryController')) { (new CategoryController())->editCategory(); exit; } break;
+    case '/admin/categories/delete': if (class_exists('CategoryController')) { (new CategoryController())->deleteCategory(); exit; } break;
+    case '/admin/createUser': if (class_exists('AdminController')) { (new AdminController())->createUser(); exit; } break;
+    case '/admin/editUser': if (class_exists('AdminController')) { (new AdminController())->editUser(); exit; } break;
+    case '/admin/deleteUser': if (class_exists('AdminController')) { (new AdminController())->deleteUser(); exit; } break;
+    case '/auth/logout': if (class_exists('AuthController')) { (new AuthController())->logout(); exit; } break;
 }
-?>
+
+// --- Part B: pretty URL router (?url=controller/method/params) ---
+if (isset($_GET['url'])) {
+    $url = rtrim($_GET['url'], '/');
+    $segments = explode('/', $url);
+
+    // common: course routes
+    if ( $segments[0] === 'course') {
+        if (class_exists('CourseController')) {
+            $ctrl = new CourseController();
+            $cmd = $segments[1] ?? 'index';
+            if ($cmd === 'index' || $cmd === '') { $ctrl->index(); exit; }
+            if ($cmd === 'detail' && isset($segments[2])) { $ctrl->detail($segments[2]); exit; }
+            if ($cmd === 'enroll' && isset($segments[2])) { $ctrl->enroll($segments[2]); exit; }
+            $ctrl->index(); exit;
+        }
+    }
+
+    // generic /controller/method/params
+    $ctrlName = ucfirst($segments[0]) . 'Controller';
+    if (class_exists($ctrlName)) {
+        $instance = new $ctrlName();
+        $method = $segments[1] ?? 'index';
+        $params = array_slice($segments, 2);
+        if (method_exists($instance, $method)) { call_user_func_array([$instance, $method], $params); exit; }
+        if (method_exists($instance, 'index')) { $instance->index(); exit; }
+    }
+}
+
+// --- Part C: query-style router (?c=controller&a=action) ---
+$c = $_GET['c'] ?? null;
+$a = $_GET['a'] ?? null;
+if ($c) {
+    $class = ucfirst($c) . 'Controller';
+    if (class_exists($class)) {
+        $inst = new $class();
+        $method = $a ?? 'index';
+        if (method_exists($inst, $method)) { $inst->$method(); exit; }
+    }
+}
+
+// nothing matched: 404
+http_response_code(404);
+echo '404 Not Found';
+exit;
