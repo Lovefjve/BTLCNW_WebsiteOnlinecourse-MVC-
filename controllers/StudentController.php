@@ -1,24 +1,25 @@
 <?php
-require_once 'core/Auth.php';
+// controllers/Controller.php - FIX VĨNH VIỄN ĐƯỜNG DẪN VIEW
+class Controller
+{
+    protected function view($viewPath, $data = [])
+    {
+        extract($data);
 
-class StudentController {
-    // Dashboard cho học viên
-    public function dashboard() {
-        // Kiểm tra đã đăng nhập
-        if (!Auth::isLoggedIn()) {
-            header('Location: ' . BASE_URL . '/auth/login');
-            exit;
+        // ĐƯỜNG DẪN TUYỆT ĐỐI – CHẠY ĐÚNG 100% MỌI LÚC
+        $file = __DIR__ . "/../views/{$viewPath}.php";
+
+        if (file_exists($file)) {
+            require $file;
+        } else {
+            die("View không tồn tại: $file");
         }
+    }
 
-        // Chỉ cho phép role = 0 (học viên)
-        if (!Auth::hasRole(0)) {
-            // Nếu không có quyền, chuyển về trang chủ
-            header('Location: ' . BASE_URL);
-            exit;
-        }
-
-        $user = Auth::getUser();
-        require_once 'views/student/dashboard.php';
+    protected function redirect($url)
+    {
+        header("Location: $url");
+        exit;
     }
 }
-
+?>
