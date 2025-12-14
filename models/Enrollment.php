@@ -1,5 +1,7 @@
 <?php
-// models/Enrollment.php
+// models/Enrollment.php - Phiên bản đầy đủ
+
+require_once 'config/Database.php';
 
 class Enrollment
 {
@@ -7,16 +9,16 @@ class Enrollment
 
     public function __construct()
     {
-        require_once 'config/database.php';
         $database = new Database();
         $this->conn = $database->getConnection();
     }
 
+    // ========== CÁC PHƯƠNG THỨC TỪ FILE 1 ==========
+
     // Lấy danh sách học viên theo khóa học với phân trang
     public function getStudentsByCourse($course_id, $offset = 0, $limit = 10)
     {
-        // Vì có UNIQUE KEY trong database, chúng ta chỉ cần DISTINCT hoặc GROUP BY u.id
-        $sql = "SELECT 
+        $sql = "SELECT DISTINCT 
                 u.id, 
                 u.username, 
                 u.email, 
@@ -28,7 +30,6 @@ class Enrollment
             FROM users u
             INNER JOIN enrollments e ON u.id = e.student_id
             WHERE e.course_id = ? AND u.role = 0
-            GROUP BY u.id  -- Đảm bảo mỗi học viên chỉ xuất hiện 1 lần
             ORDER BY e.enrolled_date DESC
             LIMIT ? OFFSET ?";
 
@@ -41,8 +42,7 @@ class Enrollment
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Lấy danh sách học viên theo khóa học (không phân trang)
-    // Phương thức getAllStudentsByCourse() cũng cần DISTINCT
+    // Lấy tất cả học viên theo khóa học (không phân trang)
     public function getAllStudentsByCourse($course_id)
     {
         $sql = "SELECT DISTINCT u.*, e.enrolled_date, e.progress, e.status
@@ -132,6 +132,35 @@ class Enrollment
         $stmt = $this->conn->prepare($sql);
         return $stmt->execute([$student_id, $course_id]);
     }
+
+    // ========== PHƯƠNG THỨC TỪ FILE 2 ==========
+
+    // Đăng ký học (phiên bản đơn giản - từ file 2)
+    public function enroll($course_id, $student_id)
+    {
+        try {
+            // Kiểm tra đã đăng ký chưa trước
+            if ($this->isStudentEnrolled($student_id, $course_id)) {
+                return false;
+            }
+
+            $sql = "INSERT INTO enrollments (course_id, student_id, enrolled_date, status, progress) 
+                    VALUES (?, ?, NOW(), 'active', 0)";
+            $stmt = $this->conn->prepare($sql);
+            return $stmt->execute([$course_id, $student_id]);
+        } catch (Exception $e) {
+            error_log("Enrollment error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Kiểm tra đã đăng ký chưa (phiên bản đơn giản)
+    public function isEnrolled($course_id, $student_id)
+    {
+        return $this->isStudentEnrolled($student_id, $course_id);
+    }
+
+    // ========== CÁC PHƯƠNG THỨC BỔ SUNG ==========
 
     // Xóa học viên khỏi khóa học
     public function unenrollStudent($student_id, $course_id)
@@ -242,4 +271,19 @@ class Enrollment
         $stmt->execute([$course_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-}
+
+    // Phương thức mới: Lấy thông tin học viên chi tiết
+    public function getStudentDetail($student_id, $course_id)
+    {
+        $sql = "SELECT u.*, e.*, c.title as course_title
+                FROM users u
+                JOIN enrollments e ON u.id = e.student_id
+                JOIN courses c ON e.course_id = c.id
+                WHERE u.id = ? AND e.course_id = ?";
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([$student_id, $course_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+}    
+

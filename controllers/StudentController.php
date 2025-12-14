@@ -27,6 +27,15 @@ class StudentController
 
         require_once $fullPath;
     }
+
+    // ========== KẾT THÚC PHƯƠNG THỨC RENDER ==========
+
+    // ========== PHƯƠNG THỨC REDIRECT ==========
+    private function redirect($url)
+    {
+        header("Location: $url");
+        exit;
+    }
     // ========== KẾT THÚC PHƯƠNG THỨC RENDER ==========
 
     public function index()
