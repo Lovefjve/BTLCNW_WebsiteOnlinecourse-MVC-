@@ -1,0 +1,26 @@
+# btl/.htaccess
+RewriteEngine On
+RewriteBase /onlinecourse/
+
+# ========== QUAN TRỌNG: Giữ query string ==========
+# Thêm [QSA] (Query String Append) để giữ tham số
+
+# Nếu file hoặc thư mục tồn tại, sử dụng nó trực tiếp
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Chuyển tất cả các request khác đến index.php
+# THÊM [QSA] để giữ ?c=course&a=index
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# ========== FIX THÊM: Xử lý root và empty path ==========
+# Khi truy cập http://localhost/btl/
+RewriteRule ^$ index.php [QSA,L]
+
+# Khi truy cập http://localhost/btl/?c=course&a=index
+# (sẽ được xử lý bởi rule trên với QSA)
+
+# Set headers cho CSS và JS
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|svg|webp)$">
+    Header set Cache-Control "max-age=86400, public"
+</FilesMatch>
