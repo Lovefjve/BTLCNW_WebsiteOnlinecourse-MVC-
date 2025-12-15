@@ -32,7 +32,7 @@ spl_autoload_register(function ($class_name) {
 
 // --- Part A: exact path switch (project's existing routes) ---
 $request = $_SERVER['REQUEST_URI'] ?? '/';
-$request = str_replace('/onlinecourse', '', $request); // if deployed under /onlinecourse
+$request = str_replace('/onlinecourse', '', $request); // if deployed under /testbtl
 $requestPath = strtok($request, '?');
 
 switch ($requestPath) {
@@ -44,8 +44,25 @@ switch ($requestPath) {
     case '/auth/postRegister': if (class_exists('AuthController')) { (new AuthController())->postRegister(); exit; } break;
     case '/auth/login': if (class_exists('AuthController')) { (new AuthController())->login(); exit; } break;
     case '/auth/postLogin': if (class_exists('AuthController')) { (new AuthController())->postLogin(); exit; } break;
-    case '/student/dashboard': if (class_exists('StudentController')) { (new StudentController())->dashboard(); exit; } break;
+    case '/student/dashboard': if (class_exists('StudentController')) { (new StudentController())->index(); exit; } break;
     case '/instructor/dashboard': if (class_exists('InstructorController')) { (new InstructorController())->dashboard(); exit; } break;
+    case '/instructor/my_courses': if (class_exists('InstructorController')) { (new InstructorController())->myCourses(); exit; } break;
+    case '/instructor/course/manage': if (class_exists('InstructorController')) { (new InstructorController())->manageCourses(); exit; } break;
+    case '/instructor/course/create': if (class_exists('InstructorController')) { (new InstructorController())->createCourse(); exit; } break;
+    case '/instructor/course/store': if (class_exists('InstructorController')) { (new InstructorController())->storeCourse(); exit; } break;
+    case '/instructor/course/update': if (class_exists('InstructorController')) { (new InstructorController())->updateCourse(); exit; } break;
+    case '/instructor/course/edit': if (class_exists('InstructorController')) { (new InstructorController())->editCourse(); exit; } break;
+    case '/instructor/course/delete': if (class_exists('InstructorController')) { (new InstructorController())->deleteCourse(); exit; } break;
+    case '/instructor/lessons/manage': if (class_exists('InstructorController')) { (new InstructorController())->manageLessons(); exit; } break;
+    case '/instructor/students/list': if (class_exists('InstructorController')) { (new InstructorController())->listStudents(); exit; } break;
+    case '/instructor/lessons/create': if (class_exists('InstructorController')) { (new InstructorController())->createLesson(); exit; } break;
+    case '/instructor/lessons/store': if (class_exists('InstructorController')) { (new InstructorController())->storeLesson(); exit; } break;
+    case '/instructor/lessons/edit': if (class_exists('InstructorController')) { (new InstructorController())->editLesson(); exit; } break;
+    case '/instructor/lessons/update': if (class_exists('InstructorController')) { (new InstructorController())->updateLesson(); exit; } break;
+    case '/instructor/lessons/delete': if (class_exists('InstructorController')) { (new InstructorController())->deleteLesson(); exit; } break;
+    case '/instructor/materials/upload': if (class_exists('InstructorController')) { (new InstructorController())->uploadMaterial(); exit; } break;
+    case '/instructor/materials/store': if (class_exists('InstructorController')) { (new InstructorController())->storeMaterial(); exit; } break;
+    case '/instructor/profile': if (class_exists('InstructorController')) { (new InstructorController())->profile(); exit; } break;
     case '/admin/dashboard': if (class_exists('AdminController')) { (new AdminController())->dashboard(); exit; } break;
     case '/admin/users': if (class_exists('AdminController')) { (new AdminController())->manageUsers(); exit; } break;
     case '/admin/categories': if (class_exists('CategoryController')) { (new CategoryController())->manageCategories(); exit; } break;

@@ -358,11 +358,11 @@
                 </div>
                 <div class="btn-group">
                     <!-- NÚT QUAY VỀ DASHBOARD -->
-                    <a href="?c=instructor&a=dashboard" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/dashboard" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay về Dashboard
                     </a>
                     <!-- NÚT TẠO KHÓA HỌC MỚI -->
-                    <a href="?c=course&a=create" class="btn">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/create" class="btn">
                         <i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới
                     </a>
                 </div>
@@ -441,10 +441,10 @@
                 <h4>Chưa có khóa học nào</h4>
                 <p>Bắt đầu bằng cách tạo khóa học đầu tiên của bạn. Mỗi khóa học có thể chứa nhiều bài học, tài liệu và bài tập cho học viên.</p>
                 <div class="btn-group" style="justify-content: center;">
-                    <a href="?c=instructor&a=dashboard" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/dashboard" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay về Dashboard
                     </a>
-                    <a href="?c=course&a=create" class="btn">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/create" class="btn">
                         <i class="fas fa-plus-circle"></i> Tạo Khóa Học Đầu Tiên
                     </a>
                 </div>
@@ -537,22 +537,22 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="?c=course&a=edit&id=<?php echo $course['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>/instructor/course/edit?id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-edit" title="Chỉnh sửa">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-view" title="Quản lý bài học">
                                         <i class="fas fa-book-open"></i>
                                     </a>
 
-                                    <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>/instructor/students/list?course_id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-students" title="Quản lý học viên">
                                         <i class="fas fa-users"></i>
                                     </a>
 
-                                    <form action="?c=course&a=delete"
+                                    <form action="<?php echo BASE_URL; ?>/instructor/course/delete"
                                         method="POST"
                                         onsubmit="return confirm('Bạn có chắc muốn xóa khóa học này?');"
                                         style="display: inline;">

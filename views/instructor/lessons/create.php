@@ -190,7 +190,7 @@
                         <i class="fas fa-book"></i> <?php echo htmlspecialchars($course['title']); ?>
                     </h3>
                 </div>
-                <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
@@ -204,10 +204,10 @@
         <?php endif; ?>
         
         <div class="form-container">
-            <form action="?c=lesson&a=store" method="POST">
+            <form action="<?php echo BASE_URL; ?>/instructor/lessons/store" method="POST">
                 <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['title']) ? 'has-error' : ''; ?>">
                     <label class="form-label" for="title">Tiêu đề bài học *</label>
                     <input type="text" 
                            id="title" 
@@ -224,7 +224,7 @@
                     <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['order']) ? 'has-error' : ''; ?>">
                     <label class="form-label" for="order">Thứ tự bài học</label>
                     <input type="number" 
                            id="order" 
@@ -241,7 +241,7 @@
                     <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['video_url']) ? 'has-error' : ''; ?>">
                     <label class="form-label" for="video_url">
                         <i class="fas fa-video"></i> URL Video (tùy chọn)
                     </label>
@@ -259,7 +259,7 @@
                     <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['content']) ? 'has-error' : ''; ?>">
                     <label class="form-label" for="content">
                         <i class="fas fa-file-alt"></i> Nội dung bài học *
                     </label>
@@ -280,7 +280,7 @@
                     <button type="submit" class="btn">
                         <i class="fas fa-save"></i> Lưu Bài học
                     </button>
-                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy bỏ
                     </a>
                 </div>

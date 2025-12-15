@@ -535,7 +535,7 @@ if (!isset($course) || !isset($lesson) || !isset($materials)) {
                     </div>
                 </div>
                 <div class="btn-group">
-                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
                 </div>
@@ -591,7 +591,7 @@ if (!isset($course) || !isset($lesson) || !isset($materials)) {
                     
                     <!-- Link hủy dẫn về trang bài học -->
                     
-                    <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy
                     </a>
                    

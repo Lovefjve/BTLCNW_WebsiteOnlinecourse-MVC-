@@ -443,7 +443,7 @@ if (!isset($course)) {
                 </div>
             </div>
             <div>
-                <a href="?c=course&a=index" class="btn btn-secondary">
+                <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
@@ -537,7 +537,7 @@ if (!isset($course)) {
                         <?php foreach ($students as $index => $student): ?>
                             <?php
                             // Lấy chữ cái đầu tiên cho avatar
-                            $first_letter = strtoupper(substr($student['display_name'] ?? '?', 0, 1));
+                            $first_letter = strtoupper(substr($student['fullname'] ?? '?', 0, 1));
 
                             // Sử dụng các biến đã được tính trong controller
                             $progress = (int) ($student['progress'] ?? 0);
@@ -559,10 +559,10 @@ if (!isset($course)) {
                                         </div>
                                         <div>
                                             <div class="student-name">
-                                                <?php echo htmlspecialchars($student['display_name']); ?>
+                                                <?php echo htmlspecialchars($student['fullname']); ?>
                                             </div>
                                             <div class="student-email">
-                                                <?php echo htmlspecialchars($student['display_email']); ?>
+                                                <?php echo htmlspecialchars($student['email']); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -597,7 +597,7 @@ if (!isset($course)) {
                 <?php if (isset($total_pages) && $total_pages > 1): ?>
                     <div class="pagination">
                         <?php if (isset($current_page) && $current_page > 1): ?>
-                            <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page - 1; ?>"
+                            <a href="<?php echo BASE_URL; ?>/instructor/students/list?course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page - 1; ?>"
                                 class="page-link">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
@@ -612,7 +612,7 @@ if (!isset($course)) {
                         </span>
 
                         <?php if (isset($current_page) && $current_page < $total_pages): ?>
-                            <a href="?c=student&a=index&course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page + 1; ?>"
+                            <a href="<?php echo BASE_URL; ?>/instructor/students/list?course_id=<?php echo $course['id']; ?>&page=<?php echo $current_page + 1; ?>"
                                 class="page-link">
                                 <i class="fas fa-chevron-right"></i>
                             </a>

@@ -43,6 +43,11 @@ $root_path = '../../';
             color: #e74c3c;
         }
         
+        .form-group.required label::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -57,6 +62,16 @@ $root_path = '../../';
             color: #e74c3c;
             font-size: 13px;
             margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .has-error input,
+        .has-error select,
+        .has-error textarea {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.1);
         }
         
         .form-actions {
@@ -162,7 +177,7 @@ $root_path = '../../';
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-edit"></i> Chỉnh sửa Khóa Học</h1>
-            <a href="?c=course&a=index" class="btn">
+            <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
@@ -182,41 +197,61 @@ $root_path = '../../';
         <?php endif; ?>
         
         <div class="edit-form">
-            <form method="POST" action="?c=instructor&a=update" enctype="multipart/form-data">
+            <form method="POST" action="<?php echo BASE_URL; ?>/instructor/course/update" enctype="multipart/form-data">
                 <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
                 
-                <div class="form-group required">
+                <div class="form-group required <?php echo isset($errors['title']) ? 'has-error' : ''; ?>">
                     <label for="title">Tên khóa học</label>
                     <input type="text" id="title" name="title" 
-                           value="<?php echo htmlspecialchars($course['title']); ?>"
+                           value="<?php echo htmlspecialchars($old_input['title'] ?? $course['title']); ?>"
                            placeholder="Ví dụ: Lập trình PHP cơ bản" required>
+                    <?php if (isset($errors['title'])): ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i> <?php echo $errors['title']; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['category_id']) ? 'has-error' : ''; ?>">
                     <label for="category_id">Danh mục</label>
                     <select id="category_id" name="category_id">
                         <option value="">Chọn danh mục</option>
                         <?php foreach ($categories as $cat): ?>
                         <option value="<?php echo $cat['id']; ?>"
-                            <?php echo $course['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                            <?php echo ($old_input['category_id'] ?? $course['category_id']) == $cat['id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($cat['name']); ?>
                         </option>
                         <?php endforeach; ?>
                     </select>
+                    <?php if (isset($errors['category_id'])): ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i> <?php echo $errors['category_id']; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['price']) ? 'has-error' : ''; ?>">
                     <label for="price">Giá (VNĐ)</label>
                     <input type="number" id="price" name="price" 
-                           value="<?php echo $course['price']; ?>"
+                           value="<?php echo htmlspecialchars($old_input['price'] ?? $course['price']); ?>"
                            placeholder="0 = Miễn phí" min="0" step="1000">
+                    <?php if (isset($errors['price'])): ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i> <?php echo $errors['price']; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group <?php echo isset($errors['duration_weeks']) ? 'has-error' : ''; ?>">
                     <label for="duration_weeks">Thời lượng (tuần)</label>
                     <input type="number" id="duration_weeks" name="duration_weeks" 
-                           value="<?php echo $course['duration_weeks']; ?>"
+                           value="<?php echo htmlspecialchars($old_input['duration_weeks'] ?? $course['duration_weeks']); ?>"
                            min="1" max="52">
+                    <?php if (isset($errors['duration_weeks'])): ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i> <?php echo $errors['duration_weeks']; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="form-group">
@@ -248,17 +283,22 @@ $root_path = '../../';
                     <?php endif; ?>
                 </div>
                 
-                <div class="form-group required">
+                <div class="form-group required <?php echo isset($errors['description']) ? 'has-error' : ''; ?>">
                     <label for="description">Mô tả khóa học</label>
                     <textarea id="description" name="description" rows="6" 
-                              placeholder="Mô tả chi tiết về khóa học..." required><?php echo htmlspecialchars($course['description']); ?></textarea>
+                              placeholder="Mô tả chi tiết về khóa học..." required><?php echo htmlspecialchars($old_input['description'] ?? $course['description']); ?></textarea>
+                    <?php if (isset($errors['description'])): ?>
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i> <?php echo $errors['description']; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="form-actions">
                     <button type="submit" class="btn">
                         <i class="fas fa-save"></i> Cập nhật khóa học
                     </button>
-                    <a href="?c=course&a=index" class="btn-cancel">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn-cancel">
                         Hủy
                     </a>
                 </div>

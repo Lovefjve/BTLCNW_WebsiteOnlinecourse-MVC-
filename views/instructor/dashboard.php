@@ -401,7 +401,7 @@ $root_path = '../../';
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <a href="?c=course&a=create" class="action-card">
+            <a href="<?php echo BASE_URL; ?>/instructor/course/create" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-plus-circle"></i>
                 </div>
@@ -411,7 +411,7 @@ $root_path = '../../';
                 </div>
             </a>
 
-            <a href="?c=course&a=index" class="action-card">
+            <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-book"></i>
                 </div>
@@ -421,7 +421,7 @@ $root_path = '../../';
                 </div>
             </a>
 
-            <a href="?c=instructor&a=profile" class="action-card" style="position: relative;">
+            <a href="<?php echo BASE_URL; ?>/instructor/profile" class="action-card" style="position: relative;">
                 <span class="coming-soon">Sắp có</span>
                 <div class="action-icon">
                     <i class="fas fa-user-edit"></i>
@@ -480,7 +480,7 @@ $root_path = '../../';
         <div class="recent-courses">
             <div class="section-header">
                 <h2><i class="fas fa-history"></i> Khóa học gần đây</h2>
-                <a href="?c=course&a=index" class="view-all-btn">Xem tất cả</a>
+                <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="view-all-btn">Xem tất cả</a>
             </div>
 
             <?php if (empty($recentCourses)): ?>
@@ -488,7 +488,7 @@ $root_path = '../../';
                     <i class="fas fa-book-open"></i>
                     <h3>Chưa có khóa học nào</h3>
                     <p>Bắt đầu bằng cách tạo khóa học đầu tiên của bạn</p>
-                    <a href="?c=course&a=create" class="create-btn">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/create" class="create-btn">
                         <i class="fas fa-plus-circle"></i> Tạo Khóa Học Đầu Tiên
                     </a>
                 </div>

@@ -228,7 +228,7 @@
                         <i class="fas fa-book"></i> <?php echo htmlspecialchars($course['title']); ?>
                     </h3>
                 </div>
-                <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
@@ -307,8 +307,8 @@
         </div>
         
         <div class="form-container">
-            <form action="?c=lesson&a=update" method="POST">
-                <input type="hidden" name="id" value="<?php echo $lesson['id']; ?>">
+            <form action="<?php echo BASE_URL; ?>/instructor/lessons/update" method="POST">
+                <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
                 <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
                 
                 <div class="form-group">
@@ -390,7 +390,7 @@
                         </button>
                     </div>
                     <div>
-                        <a href="?c=lesson&a=index&course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
+                        <a href="<?php echo BASE_URL; ?>/instructor/lessons/manage?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary">
                             <i class="fas fa-times"></i> Hủy bỏ
                         </a>
                     </div>
@@ -399,9 +399,8 @@
             </form>
             
             <!-- Form ẩn để xóa -->
-            <form id="delete-form" action="?c=lesson&a=delete" method="POST" style="display: none;">
-                <input type="hidden" name="id" value="<?php echo $lesson['id']; ?>">
-                <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+            <form id="delete-form" action="<?php echo BASE_URL; ?>/instructor/lessons/delete" method="POST" style="display: none;">
+                <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
             </form>
         </div>
     </div>

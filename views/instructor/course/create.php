@@ -163,7 +163,7 @@ $root_path = '../../';
     <div class="container">
         <div class="header">
             <h1><i class="fas fa-plus-circle"></i> Tạo Khóa Học Mới</h1>
-            <a href="?c=course&a=index" class="btn">
+             <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn">
                 <i class="fas fa-arrow-left"></i> Quay lại
             </a>
         </div>
@@ -183,7 +183,7 @@ $root_path = '../../';
         <?php endif; ?>
         
         <div class="create-form">
-            <form method="POST" action="?c=instructor&a=storeCourse" enctype="multipart/form-data">
+            <form method="POST" action="<?php echo BASE_URL; ?>/instructor/course/store" enctype="multipart/form-data">
                 <div class="form-group required <?php echo isset($errors['title']) ? 'has-error' : ''; ?>">
                     <label for="title">Tên khóa học</label>
                     <input type="text" id="title" name="title" 
@@ -260,7 +260,7 @@ $root_path = '../../';
                     <button type="submit" class="btn">
                         <i class="fas fa-save"></i> Lưu khóa học
                     </button>
-                    <a href="?c=course&a=index" class="btn-cancel">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn-cancel">
                         Hủy
                     </a>
                 </div>

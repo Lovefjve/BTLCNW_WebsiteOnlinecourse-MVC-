@@ -434,10 +434,10 @@
                     </h3>
                 </div>
                 <div class="btn-group">
-                    <a href="?c=course&a=index" class="btn btn-secondary">
+                    <a href="<?php echo BASE_URL; ?>/instructor/course/manage" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Quay lại
                     </a>
-                    <a href="?c=lesson&a=create&course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">
+                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/create?course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">
                         <i class="fas fa-plus-circle"></i> Thêm bài học
                     </a>
                 </div>
@@ -497,7 +497,7 @@
                 <i class="fas fa-book-open"></i>
                 <h4>Chưa có bài học nào</h4>
                 <p>Bắt đầu xây dựng khóa học của bạn bằng cách thêm bài học mẫu. Mỗi bài học có thể chứa video, tài liệu và bài tập.</p>
-                <a href="?c=lesson&a=create&course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">
+                <a href="<?php echo BASE_URL; ?>/instructor/lessons/create?course_id=<?php echo $course['id'] ?? 0; ?>" class="btn">
                     <i class="fas fa-plus-circle"></i> Thêm Bài Học Đầu Tiên
                 </a>
             </div>
@@ -526,7 +526,7 @@
                             </td>
                             <td>
                                 <div class="lesson-title">
-                                    <a href="?c=lesson&a=edit&id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>">
+                                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/edit?id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>">
                                         <?php echo htmlspecialchars($lesson['title'] ?? 'Bài học không có tiêu đề'); ?>
                                     </a>
                                     <?php if ($doc_count > 0): ?>
@@ -569,26 +569,25 @@
                             <td>
                                 <div class="action-buttons">
                                     <!-- Nút Chỉnh sửa -->
-                                    <a href="?c=lesson&a=edit&id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>/instructor/lessons/edit?id=<?php echo $lesson['id']; ?>&course_id=<?php echo $course['id']; ?>"
                                         class="btn-action btn-edit" title="Chỉnh sửa bài học">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     
                                     
                                     <!-- Nút Đăng tài liệu (dẫn đến trang upload) -->
-                                    <a href="?c=material&a=create&lesson_id=<?php echo $lesson['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>/instructor/materials/upload?lesson_id=<?php echo $lesson['id']; ?>"
                                         class="btn-action btn-upload" 
                                         title="Tải lên tài liệu">
                                         <i class="fas fa-upload"></i>
                                     </a>
                                     
                                     <!-- Nút Xóa -->
-                                    <form action="?c=lesson&a=delete"
+                                    <form action="<?php echo BASE_URL; ?>/instructor/lessons/delete"
                                         method="POST"
                                         onsubmit="return confirm('Bạn có chắc muốn xóa bài học này?');"
                                         style="display: inline;">
-                                        <input type="hidden" name="id" value="<?php echo $lesson['id']; ?>">
-                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                        <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
                                         <button type="submit" class="btn-action btn-delete" title="Xóa bài học">
                                             <i class="fas fa-trash"></i>
                                         </button>
